@@ -144,7 +144,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;font-size:14px;margin-top:6px}
 #ptcard .kv dt{color:var(--ink2);margin:0;white-space:nowrap}
-#ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
 #ptcard.is-conn{border-color:var(--go)}
 #ptcard.is-conn .dot{background:var(--go);box-shadow:0 0 0 3px #1e3416}
 #ptcard.is-conn .word{color:#9bd67a}
@@ -403,10 +403,10 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <div class="model">ZOLL 731 EMV+</div>
         <dl class="kv">
           <dt>Link</dt><dd id="vent-meta">USB serial · 1 Hz</dd>
-          <dt>Loop mode since</dt><dd id="vent-since">—</dd>
+          <dt>Mode since</dt><dd id="vent-since">—</dd>
           <dt>Serial</dt><dd>731-04182</dd>
           <dt>Vent mode</dt><dd>AC (V)</dd>
-          <dt>Last command</dt><dd id="vent-cmd">—</dd>
+          <dt>Last cmd</dt><dd id="vent-cmd">—</dd>
           <dt>Battery</dt><dd>84% · 2 h 10 m</dd>
           <dt>O₂ supply</dt><dd>1,640 psi</dd>
         </dl>
@@ -815,9 +815,9 @@ function renderTop(){
   const pc=$('#ptcard'), L=S.vent_link;
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
-  $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `no data for ${cellsHTML(mmss(S.t-L.lostAt))}`;
+  $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
   $('#vent-since').textContent = !S.running ? 'stopped ' + hm(S.startT + S.runSince*1000) : hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
-  $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} · ${hm(S.startT+S.lastCmd.t*1000)} · OK` : 'none yet';
+  $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓ ${hm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
   lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO';
