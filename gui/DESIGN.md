@@ -107,13 +107,17 @@ Rules:
 
 Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button.
+The brand box also hosts the demo-only SIM button. The clock is a button that toggles
+LOCAL / ZULU; every displayed time, including the log, follows it.
 
-Left column (268 px), rows **432 / 280 / 130**:
-1. **Mode tile** (button): "Closed loop" label · loop icon · AUTO/MANUAL/STOPPED ·
-   since-time · two-line description · prompt (TAP TO SWITCH… / PRESS START TO RESUME).
-2. **Ventilator card**: CONNECTED / LINK LOST, make and model (placeholder Zoll 731 EMV+),
-   link type and serial, battery, O₂ supply. Also hosts the demo-only SIM button.
-3. **START / STOP** button.
+Left column (268 px), rows **354 / 64 / 280 / 130** (each beside its right-column row):
+1. **Status tile** (display only): "Closed loop" label · loop icon · AUTO/MANUAL/STOPPED ·
+   since-time · two-line description.
+2. **Ventilator strip**: CONNECTED / LINK LOST, battery, make and model (placeholder
+   Zoll 731 EMV+), link type.
+3. **Mode switch** (button, beside the controls it governs): shows the *action*,
+   SWITCH TO MANUAL (amber) or SWITCH TO AUTO (green); arm + confirm; inert when STOPPED.
+4. **START / STOP** button.
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
@@ -121,7 +125,9 @@ Right column, rows **354 / 64 / 280 / 130**:
    SpO₂ also has FiO₂ → 100% + CONFIRM bottom-left). Tapping the target opens an in-tile
    editor (low / high with − / +, APPLY TARGET / CANCEL, 20 s timeout). Limits: SpO₂ low
    85–97, high 88–100, gap ≥ 2; etCO₂ low 25–50, high 30–60, gap ≥ 4. Changes are logged.
-2. **Summary row** (read-only): Ppeak · Pplat · I:E · MVe · VTe · Leak.
+2. **Summary row**: Ppeak · Pplat · I:E · MVe · VTe · Leak. All read-only except I:E, which
+   is a button: tapping it turns the tile into a stepper (− / +, APPLY / CANCEL, 12 s
+   timeout) over 1:1 · 1:1.5 · 1:2 · 1:2.5 · 1:3 · 1:4. I:E is always user-controlled.
 3. **Controls**: FiO₂ · PEEP · VT · RR, i.e. oxygenation pair under SpO₂, ventilation pair
    under etCO₂. Each: ownership band, name (identity colour), unit, value, − / +, reserved
    aux row (APPLY/CANCEL, or SUGGESTS…, or RETURN TO CLOVER), set time.

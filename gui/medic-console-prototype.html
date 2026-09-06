@@ -49,6 +49,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .tb{background:var(--g1);border:1px solid var(--line);display:flex;align-items:center;padding:0 14px;min-width:0;gap:10px}
 .tb-brand{padding:0 18px}
 .tb-time{justify-content:center}
+.tb-time:active{background:var(--g2)}
+#tz-lab{white-space:nowrap}
 .tb-light{flex-direction:column;justify-content:center;gap:4px;background:var(--g2);border-color:var(--line2)}
 .tb-light:active{background:var(--g3)}
 .tb-light .lab{font-size:11px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
@@ -86,20 +88,16 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* body */
 #body{display:grid;grid-template-columns:268px 1fr;gap:14px;min-height:0}
-#left{display:grid;grid-template-rows:432px 280px 130px;gap:14px;min-height:0}
+#left{display:grid;grid-template-rows:354px 64px 280px 130px;gap:14px;min-height:0}
 #left>*{width:268px;max-width:268px;min-width:0;height:100%;justify-self:stretch;overflow:hidden;align-self:stretch}
 #left .sub,#left .lab,#left .word{width:100%}
 #right{display:grid;grid-template-rows:354px 64px 280px 130px;gap:14px;min-height:0}
 #right>*{min-height:0;overflow:hidden}
 
 /* closed-loop status box */
-#loopbox{border:2px solid;display:grid;grid-template-rows:14px 96px 44px 16px 44px 20px;align-content:center;justify-items:center;gap:14px;text-align:center;padding:0 16px}
+#loopbox{border:2px solid;display:grid;grid-template-rows:14px 96px 44px 16px 44px;align-content:center;justify-items:center;gap:14px;text-align:center;padding:0 16px}
 #loopbox .since{font-size:12px;letter-spacing:.08em;opacity:.75}
 #loopbox .sub{font-size:14px;letter-spacing:.03em;line-height:1.45;opacity:.85;height:44px;overflow:hidden}
-#loopbox .hint{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;opacity:.9}
-#loopbox.armed{animation:arm-pulse 1.2s ease-in-out infinite}
-#loopbox.armed .word{font-size:36px}
-#loopbox.is-halted{cursor:default}
 #loopbox .icon-row{height:96px;display:flex;align-items:center;justify-content:center}
 #loopbox .lab{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.8}
 #loopbox .word{font-family:var(--f-disp);font-weight:700;font-size:44px;letter-spacing:.1em;line-height:1;display:flex;align-items:center;justify-content:center}
@@ -111,13 +109,25 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox .slash-halo{stroke:#2a2110;stroke-width:8}
 @keyframes spin{to{transform:rotate(360deg)}}
 #loopbox.is-running{background:#13200f;border-color:var(--go);color:#9bd67a}
-#loopbox.is-running:active,#loopbox.is-manual:active{filter:brightness(1.2)}
 #loopbox.is-running .arrows{animation-play-state:running}
 #loopbox.is-manual{background:#2a2110;border-color:var(--warn);color:#f0c95c}
 #loopbox.is-manual .slash,#loopbox.is-manual .slash-halo,#loopbox.is-halted .slash,#loopbox.is-halted .slash-halo{display:block}
 #loopbox.is-halted .slash-halo{stroke:#2c130e}
 #loopbox.is-halted{background:#2c130e;border-color:var(--crit);color:#ff9b8c}
 @keyframes blink{50%{opacity:.25}}
+
+/* MODE SWITCH */
+#modebtn{border:2px solid;display:grid;grid-template-rows:14px 44px 44px 20px;align-content:center;justify-items:center;gap:12px;text-align:center;padding:0 16px}
+#modebtn .lab{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.8}
+#modebtn .word{font-family:var(--f-disp);font-weight:700;font-size:44px;letter-spacing:.08em;line-height:1}
+#modebtn .sub{font-size:14px;letter-spacing:.03em;line-height:1.45;opacity:.85;height:44px;overflow:hidden}
+#modebtn .hint{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;opacity:.9}
+#modebtn.to-manual{background:#2a2110;border-color:var(--warn);color:#f0c95c}
+#modebtn.to-auto{background:#13200f;border-color:var(--go);color:#9bd67a}
+#modebtn.to-manual:active,#modebtn.to-auto:active{filter:brightness(1.2)}
+#modebtn.is-halted{background:var(--g1);border-color:var(--line2);color:var(--ink3);cursor:default}
+#modebtn.armed{animation:arm-pulse 1.2s ease-in-out infinite}
+#modebtn.armed .word{font-size:36px}
 
 /* GO/STOP */
 #gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
@@ -132,24 +142,21 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 @keyframes arm-pulse{0%,100%{filter:brightness(1);border-color:rgba(255,255,255,.35);box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{filter:brightness(1.35);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.18)}}
 
 /* left lower: patient card */
-#ptcard{border:2px solid var(--line);background:var(--g1);padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
-#ptcard .lab{font-size:11px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
-#ptcard .conn{display:flex;align-items:center;gap:12px;height:30px}
-#ptcard .dot{width:16px;height:16px;border-radius:50%;flex:none}
-#ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:26px;letter-spacing:.1em;line-height:1}
-#ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ptcard .meta{font-size:13px;color:var(--ink2);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:16px}
-#ptcard .stats{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink2);white-space:nowrap}
-#ptcard .stats span{display:flex;justify-content:space-between}
-#ptcard .stats b{font-family:var(--f-disp);font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+#ptcard{border:2px solid var(--line);background:var(--g1);padding:0 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:0;overflow:hidden}
+#ptcard .conn{display:flex;align-items:center;gap:10px;height:24px}
+#ptcard .dot{width:12px;height:12px;border-radius:50%;flex:none}
+#ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:18px;letter-spacing:.1em;line-height:1}
+#ptcard .batt{margin-left:auto;font-family:var(--f-disp);font-weight:600;font-size:14px;color:var(--ink2);font-variant-numeric:tabular-nums}
+#ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:14px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:16px}
+#ptcard .meta{font-family:var(--f-ui);font-weight:500;font-size:12px;color:var(--ink2)}
 #ptcard.is-conn{border-color:var(--go)}
 #ptcard.is-conn .dot{background:var(--go);box-shadow:0 0 0 3px #1e3416}
 #ptcard.is-conn .word{color:#9bd67a}
 #ptcard.is-lost{border-color:var(--crit);background:#2c130e;animation:vital-pulse 1s steps(2,end) infinite}
 #ptcard.is-lost .dot{background:none;box-shadow:inset 0 0 0 3px var(--crit)}
 #ptcard.is-lost .word{color:#ff9b8c}
-#ptcard.is-lost .meta,#ptcard.is-lost .stats,#ptcard.is-lost .lab{color:#f5cfc7}
-#simbtn{margin-top:auto;height:34px;border:1px dashed var(--line2);color:var(--ink3);font-size:12px;letter-spacing:.16em}
+#ptcard.is-lost .meta,#ptcard.is-lost .batt{color:#f5cfc7}
+#simbtn{margin-left:auto;height:30px;padding:0 8px;border:1px dashed var(--line2);color:var(--ink3);font-size:11px;letter-spacing:.16em;flex:none}
 #simbtn:active{color:var(--ink)}
 
 /* outcome tiles */
@@ -279,6 +286,22 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .sum .val{display:flex;align-items:baseline;justify-content:center;gap:6px;white-space:nowrap}
 .sum .val b{font-family:var(--f-disp);font-weight:700;font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
 .sum .val small{font-size:12px;color:var(--ink2);letter-spacing:.04em}
+#ie-tile{padding:0;position:relative}
+#ie-tile{border-color:var(--line2)}
+#ie-tile .ie-face{width:100%;height:100%;display:grid;grid-template-rows:13px 1fr;padding:5px 12px 4px;text-align:left}
+#ie-tile .ie-face:active{background:var(--g2)}
+#ie-tile .ie-edit{display:none;position:absolute;inset:0;grid-template-rows:22px 1fr;gap:3px;padding:4px 6px}
+#ie-tile.editing .ie-edit{display:grid}
+#ie-tile.editing .ie-face{visibility:hidden}
+#ie-tile.editing{border-color:var(--warn)}
+#ie-tile .ie-act{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+#ie-tile .ie-act button{font-family:var(--f-disp);font-weight:700;font-size:11px;letter-spacing:.12em;border:1px solid var(--line2)}
+#ie-tile .ie-cancel{background:var(--g2)}
+#ie-tile .ie-apply{background:var(--warn);color:var(--warn-ink);border-color:var(--warn)}
+#ie-tile .ie-row{display:grid;grid-template-columns:34px 1fr 34px;align-items:center}
+#ie-tile .ie-row button{height:100%;border:1px solid var(--line2);background:var(--g2);font-family:var(--f-disp);font-size:22px;font-weight:600}
+#ie-tile .ie-row button:disabled{opacity:.3}
+#ie-tile .ie-row b{font-family:var(--f-disp);font-weight:700;font-size:26px;text-align:center;color:var(--warn);font-variant-numeric:tabular-nums}
 
 /* controls */
 #controls{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:280px;gap:14px;min-height:0}
@@ -362,34 +385,28 @@ body.light-dim #light{display:block;background:rgba(0,0,0,.55)}
 body.light-red #light{display:block;background:rgba(120,0,0,.55);mix-blend-mode:multiply}
 body.light-red #stage{filter:saturate(.2) brightness(.85)}
 
-@media (prefers-reduced-motion:reduce){.vital,.alert{animation:none!important}#gostop.armed,#loopbox.armed,.vital .o2c.show,.vital .o2.armed{animation-duration:2.4s}#loopbox .arrows{animation-duration:60s}}
+@media (prefers-reduced-motion:reduce){.vital,.alert{animation:none!important}#gostop.armed,#modebtn.armed,.vital .o2c.show,.vital .o2.armed{animation-duration:2.4s}#loopbox .arrows{animation-duration:60s}}
 </style>
 
 <div id="viewport">
 <div id="stage" aria-live="off">
 
   <header id="topbar">
-    <div class="tb tb-brand"><div class="brand"><span class="name">CLOVER</span><span class="sub">Closed-loop O₂ · ventilation</span></div></div>
+    <div class="tb tb-brand"><div class="brand"><span class="name">CLOVER</span><span class="sub">Closed-loop O₂ · ventilation</span></div><button id="simbtn" aria-label="Demo scenarios">SIM</button></div>
     <div class="tb tb-ctrl"><div id="ctrl-status"><span class="lab" id="ctrl-lab">Controller</span><span class="val" id="ctrl-line">—</span></div><div id="runbox" class="cdbox"><span class="lab">Run time</span><span class="cd" id="elapsed"></span></div><button id="nextbox" class="cdbox" aria-label="Force a controller decision now"><span class="lab">Update ▸</span><span class="cd" id="next-cd"></span></button></div>
     <button class="tb tb-light" id="lightbtn" aria-label="Display brightness"><span class="lab">Display</span><span class="mode"><span id="light-badge">BRIGHT</span></span></button>
-    <div class="tb tb-time"><div id="clock"><span id="clk"></span><small>LOCAL TIME</small></div></div>
+    <button class="tb tb-time" id="clockbtn" aria-label="Switch clock time zone"><div id="clock"><span id="clk"></span><small id="tz-lab">LOCAL · TAP FOR ZULU</small></div></button>
   </header>
 
   <div id="body">
     <aside id="left">
-      <button id="loopbox" class="is-running"><span class="lab">Closed loop</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span><span class="since"></span><span class="sub"></span><span class="hint"></span></button>
-      <section id="ptcard" class="is-conn">
-        <span class="lab">Ventilator</span>
-        <div class="conn"><span class="dot"></span><span class="word">CONNECTED</span></div>
-        <div class="model">ZOLL 731 EMV+</div>
-        <div class="meta" id="vent-meta">USB serial · SN 731-04182 · streaming</div>
-        <div class="stats"><span>Battery <b>84%</b></span><span>O₂ supply <b>1,640 psi</b></span></div>
-        <button id="simbtn">SIM · DEMO SCENARIOS</button>
-      </section>
+      <section id="loopbox" class="is-running"><span class="lab">Closed loop</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span><span class="since"></span><span class="sub"></span></section>
+      <section id="ptcard" class="is-conn"><div class="conn"><span class="dot"></span><span class="word">CONNECTED</span><span class="batt">84%</span></div><div class="model">ZOLL 731 EMV+ <span class="meta" id="vent-meta">· USB serial</span></div></section>
+      <button id="modebtn" class="to-manual"><span class="lab">Switch to</span><span class="word">MANUAL</span><span class="sub"></span><span class="hint"></span></button>
       <button id="gostop" class="is-running"><span class="word">STOP</span><span class="sub"></span></button>
     </aside>
 
-    <main id="right">
+        <main id="right">
       <section id="outcomes">
         <div class="vital" id="v-spo2" data-k="spo2">
           <span class="stpill"></span>
@@ -414,7 +431,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
       <section id="summary">
         <div class="sum"><span class="lab">Ppeak</span><span class="val"><b id="s-ppk">—</b><small>cmH₂O</small></span></div>
         <div class="sum"><span class="lab">Pplat</span><span class="val"><b id="s-ppl">—</b><small>cmH₂O</small></span></div>
-        <div class="sum"><span class="lab">I:E</span><span class="val"><b id="s-ie">1:2</b><small></small></span></div>
+        <div class="sum" id="ie-tile"><button class="ie-face" id="ie-open"><span class="lab">I:E · tap to set</span><span class="val"><b id="s-ie">1:2</b><small></small></span></button><div class="ie-edit"><div class="ie-act"><button class="ie-cancel">CANCEL</button><button class="ie-apply">APPLY</button></div><div class="ie-row"><button class="ie-dec">−</button><b id="ie-val">1:2</b><button class="ie-inc">+</button></div></div></div>
         <div class="sum"><span class="lab">MVe</span><span class="val"><b id="s-mve">—</b><small>L/min</small></span></div>
         <div class="sum"><span class="lab">VTe</span><span class="val"><b id="s-vte">—</b><small>mL</small></span></div>
         <div class="sum"><span class="lab">Leak</span><span class="val"><b id="s-leak">—</b><small>%</small></span></div>
@@ -466,8 +483,9 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
 const $ = s => document.querySelector(s);
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const pad = n => String(n).padStart(2,'0');
-const hms = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
-const hm  = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+let TZ = 'local';
+const hms = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+const hm  = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const mmss = s => `${Math.floor(s/60)}:${pad(Math.floor(s%60))}`;
 
 /* ---------------- parameter definitions ---------------- */
@@ -481,6 +499,7 @@ const ORDER = ['fio2','peep','vt','rr'];   // oxygenation pair under SpO₂, ven
 const TGT = { spo2:[92,96], etco2:[35,45] };
 const TLIM = { spo2:{ lo:[85,97], hi:[88,100], gap:2, unit:'%' }, etco2:{ lo:[25,50], hi:[30,60], gap:4, unit:'mmHg' } };
 const TEDIT_TIMEOUT = 20;   // s before an unconfirmed target edit is discarded
+const IE = ['1:1','1:1.5','1:2','1:2.5','1:3','1:4'];
 const DECISION_PERIOD = 30;      // s between controller decisions
 const OVERRIDE_HOLD = 300;       // s the controller honors a user override
 const PENDING_TIMEOUT = 12;      // s before an unconfirmed adjustment cancels
@@ -493,7 +512,7 @@ const S = {
   patient:{ shunt:0.12, vco2:200, signal:true, signalUntil:0 },
   vent_link:{ connected:true, lostAt:0, until:0 },
   spo2:96, etco2:40, f:{spo2:96, etco2:40}, shown:{spo2:96, etco2:40}, hist:[], log:[], alerts:[],
-  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, flash:true,
+  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, ie:2, ieEdit:null, flash:true,
 };
 ORDER.forEach(k => { S.setBy[k] = {src:'SYS', t:0}; S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; });
 
@@ -642,6 +661,7 @@ function tick(){
   S.t += 1;
   stepPatient();
   ['spo2','etco2'].forEach(k => { const e=S.tedit[k]; if (e && S.t - e.at > TEDIT_TIMEOUT){ S.tedit[k]=null; addLog('SYS', `${k==='spo2'?'SpO₂':'etCO₂'} target edit discarded`, 'Not applied within 20 s.'); } });
+  if (S.ieEdit && S.t - S.ieEdit.at > PENDING_TIMEOUT){ S.ieEdit=null; addLog('SYS','I:E adjustment discarded','Not applied within 12 s.'); }
   ORDER.forEach(k => { const p=S.pending[k]; if (p && S.t - p.at > PENDING_TIMEOUT){ S.pending[k]=null; addLog('SYS', `${P[k].plain} adjustment discarded`, 'Not confirmed within 12 s.'); } });
   /* out-of-range interrupt: a value leaving target, or escalating, triggers an immediate decision */
   const rank = {ok:0, lost:1, warn:1, crit:2}, worse = [];
@@ -781,14 +801,22 @@ function renderTop(){
   const pc=$('#ptcard'), L=S.vent_link;
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
-  $('#vent-meta').innerHTML = L.connected ? 'USB serial · SN 731-04182 · streaming' : `USB serial · no data for ${cellsHTML(mmss(S.t-L.lostAt))}`;
+  $('#vent-meta').innerHTML = L.connected ? '· USB serial' : `· no data for ${cellsHTML(mmss(S.t-L.lostAt))}`;
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
-  const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
-  lb.className = (!S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running') + (mArmed ? ' armed' : '');
-  lb.querySelector('.wt').textContent = mArmed ? (S.mode==='AUTO' ? 'GO MANUAL?' : 'GO AUTO?') : (!S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO');
+  lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
+  lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO';
   lb.querySelector('.since').textContent = !S.running ? 'stopped at ' + hm(S.startT + S.runSince*1000) : 'since ' + hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
   lb.querySelector('.sub').textContent = !S.running ? 'Settings held. No automatic changes until START.' : manual ? 'You set the ventilator. CLOVER only suggests.' : 'CLOVER adjusts FiO₂ · PEEP · VT · RR. You can override any value.';
-  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START TO RESUME' : manual ? 'TAP TO SWITCH TO AUTO' : 'TAP TO SWITCH TO MANUAL';
+  const mb=$('#modebtn'), mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
+  mb.className = (!S.running ? 'is-halted' : S.mode==='AUTO' ? 'to-manual' : 'to-auto') + (mArmed ? ' armed' : '');
+  mb.querySelector('.lab').textContent = mArmed ? 'Confirm' : 'Switch to';
+  mb.querySelector('.word').textContent = S.mode==='AUTO' ? (mArmed ? 'MANUAL?' : 'MANUAL') : (mArmed ? 'AUTO?' : 'AUTO');
+  mb.querySelector('.sub').textContent = !S.running ? 'Mode can be changed once the loop is started.' : S.mode==='AUTO' ? 'You take control of all four settings. CLOVER will only suggest.' : 'CLOVER resumes adjusting all four settings.';
+  mb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START FIRST' : 'TAP · THEN CONFIRM';
+  $('#s-ie').textContent = IE[S.ie];
+  const ie=$('#ie-tile'); ie.classList.toggle('editing', !!S.ieEdit);
+  if (S.ieEdit){ $('#ie-val').textContent = IE[S.ieEdit.idx]; ie.querySelector('.ie-dec').disabled = S.ieEdit.idx<=0; ie.querySelector('.ie-inc').disabled = S.ieEdit.idx>=IE.length-1; }
+  $('#tz-lab').textContent = TZ==='utc' ? 'ZULU · TAP FOR LOCAL' : 'LOCAL · TAP FOR ZULU';
   const gs=$('#gostop');
   const armed = S.gsArm!=null, left = armed ? Math.ceil((5000 - (performance.now()-S.gsArm))/1000) : 0;
   gs.className = (S.running ? 'is-running' : 'is-stopped') + (armed ? ' armed' : '');
@@ -881,6 +909,13 @@ function renderLog(){
 }
 
 /* ---------------- interactions ---------------- */
+$('#clockbtn').addEventListener('click', ()=>{ TZ = TZ==='utc' ? 'local' : 'utc'; addLog('SYS', `Clock display → ${TZ==='utc'?'ZULU (UTC)':'local time'}`, 'All displayed times, including this log, follow the clock setting.'); render(); if ($('#log-ovl').classList.contains('open')) renderLog(); });
+$('#ie-open').addEventListener('click', ()=>{ S.ieEdit = { idx:S.ie, at:S.t }; render(); });
+$('#ie-tile').querySelector('.ie-edit').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b||!S.ieEdit) return;
+  if (b.classList.contains('ie-cancel')){ S.ieEdit=null; }
+  else if (b.classList.contains('ie-apply')){ const from=IE[S.ie]; S.ie=S.ieEdit.idx; S.ieEdit=null; if (IE[S.ie]!==from) addLog('USER', `I:E ${from} → ${IE[S.ie]}`, 'Operator changed the inspiratory:expiratory ratio. This setting is always user-controlled; CLOVER does not adjust it.'); }
+  else { S.ieEdit.idx = clamp(S.ieEdit.idx + (b.classList.contains('ie-inc')?1:-1), 0, IE.length-1); S.ieEdit.at=S.t; }
+  render(); });
 $('#nextbox').addEventListener('click', ()=>{
   if (!S.running) return;
   addLog('USER','Update requested', `Operator tapped UPDATE with ${mmss(Math.max(0, DECISION_PERIOD - (S.t - S.lastDecision)))} left in the cycle.`);
@@ -894,7 +929,7 @@ $('#gostop').addEventListener('click', ()=>{
   else addLog('USER','STOP — controller stopped','Operator stopped the closed loop. Ventilator continues at current settings: '+['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ')+'.');
   evalAlerts(); render();
 });
-$('#loopbox').addEventListener('click', ()=>{
+$('#modebtn').addEventListener('click', ()=>{
   if(!S.running) return;
   if (S.modeArm==null){ S.modeArm = performance.now(); render(); return; }
   S.modeArm=null;
