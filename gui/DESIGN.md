@@ -88,8 +88,11 @@ Tactical low-light palette, single theme (always dark).
 
 Rules:
 - Identity colours are constant. **The number never changes colour with state.**
-- State is shown by the **whole tile filling**: amber `#4b3309` for out of range, red
-  `#5e1b11` pulsing for critical, blue `#132433` dashed for signal lost. A corner pill
+- State is shown by the **whole tile filling**: amber `#4b3309` for out of range, the STOP
+  button's red (`#a03a28` → `#7a2818` gradient, border `#d6614a`) for critical, blue
+  `#132433` dashed for signal lost. Every critical state (critical vital, ventilator link
+  lost, unacknowledged critical alert) uses that same red and the same smooth 1.2 s
+  brightness pulse, so there is exactly one "flashing red" on the device. A corner pill
   (OUT OF RANGE / CRITICAL / NO SIGNAL) carries the state in words too.
 - Armed controls share one smooth pulse: brightness 1 → 1.35 and border fading to white
   with a soft halo, 1.2 s ease-in-out. Never a stepped blink.
