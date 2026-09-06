@@ -57,9 +57,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .tb-light .lab{font-size:11px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
 .tb-light .mode{font-family:var(--f-disp);font-weight:700;font-size:24px;letter-spacing:.12em;line-height:1}
 .tb-light.hot .mode{color:#ff8a78}
-.cdbox{flex:none;width:124px;height:58px;border:1px solid var(--line2);background:var(--g2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-.cdbox .lab{font-size:11px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase}
-.cdbox .cd{font-family:var(--f-disp);font-weight:700;font-size:24px;line-height:1}
+.cdbox{flex:1;min-width:0;height:58px;border:1px solid var(--line2);background:var(--g2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.cdbox .lab{font-size:12px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
+.cdbox .cd{font-family:var(--f-disp);font-weight:700;font-size:28px;line-height:1}
 .cdbox .cd .c{display:inline-block;width:.64em;text-align:center}
 .cdbox .cd .c.sep{width:.34em}
 .cd-cells .c{display:inline-block;width:.6em;text-align:center}
@@ -405,7 +405,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
 
   <header id="topbar">
     <button class="tb tb-brand" id="dispbtn"><div class="brand"><span class="name">CLOVER BASIC</span><span class="sub">Switch to advanced display</span></div></button>
-    <div class="tb tb-ctrl"><div id="ctrl-status"><span class="lab" id="ctrl-lab">Controller</span><span class="val" id="ctrl-line">—</span></div><div id="runbox" class="cdbox"><span class="lab">Run time</span><span class="cd" id="elapsed"></span></div><button id="nextbox" class="cdbox" aria-label="Force a controller decision now"><span class="lab">Update ▸</span><span class="cd" id="next-cd"></span></button></div>
+    <div class="tb tb-ctrl"><div id="runbox" class="cdbox"><span class="lab">Run time</span><span class="cd" id="elapsed"></span></div><button id="nextbox" class="cdbox" aria-label="Force a controller decision now"><span class="lab">Update ▸</span><span class="cd" id="next-cd"></span></button></div>
     <button class="tb tb-light" id="lightbtn" aria-label="Display brightness"><span class="lab">Display</span><span class="mode"><span id="light-badge">BRIGHT</span></span></button>
     <button class="tb tb-time" id="clockbtn" aria-label="Switch clock time zone"><div id="clock"><span id="clk"></span><small id="tz-lab">LOCAL · TAP FOR ZULU</small></div></button>
   </header>
@@ -859,10 +859,6 @@ function setCells(el, str){
 function renderTop(){
   setCells($('#clk'), hms(simNow()));
   setCells($('#elapsed'), Math.floor(S.t/3600).toString().padStart(2,'0') + ':' + pad(Math.floor(S.t%3600/60)));
-  const line=$('#ctrl-line');
-  $('#ctrl-lab').textContent = !S.running ? 'Controller · stopped' : S.mode==='AUTO' ? 'Controller · adjusting' : 'Controller · advising only';
-  if (!S.running) line.textContent = 'Settings held';
-  else { const last = [...S.log].reverse().find(l=>l.src==='CTRL'); line.textContent = last ? 'Last: ' + last.title.replace('Advisory (MANUAL, not applied): ','') : '—'; }
   const nb=$('#nextbox'); nb.classList.toggle('idle', !S.running);
   setCells($('#next-cd'), S.running ? mmss(Math.max(0, DECISION_PERIOD - (S.t - S.lastDecision))) : '-:--');
   $('#log-badge').textContent = S.log.length;
