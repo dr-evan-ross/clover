@@ -839,7 +839,7 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
     const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : owner==='user' ? 'USER IN CONTROL' : 'USER IN CONTROL · STOPPED';
+    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
     el.querySelector('.was').textContent = p ? `NOW ${P[k].fmt(S.vent[k])} · APPLY TO CONFIRM` : '\u00a0';
     const linked = S.vent_link.connected;
