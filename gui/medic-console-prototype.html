@@ -88,9 +88,10 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* body */
 #body{display:grid;grid-template-columns:268px 1fr;gap:14px;min-height:0}
-#left{display:grid;grid-template-rows:432px 280px 130px;gap:14px;min-height:0}
+#left{display:grid;grid-template-rows:354px 64px 280px 130px;gap:14px;min-height:0}
 #left>*{width:268px;max-width:268px;min-width:0;height:100%;justify-self:stretch;overflow:hidden;align-self:stretch}
 #left .sub,#left .lab,#left .word{width:100%}
+#advbtn .word,#advbtn .sub{width:auto}
 #right{display:grid;grid-template-rows:354px 64px 280px 130px;gap:14px;min-height:0}
 #right>*{min-height:0;overflow:hidden}
 
@@ -123,6 +124,12 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox.armed{animation:arm-pulse 1.2s ease-in-out infinite}
 
 
+/* ADVANCED */
+#advbtn{border:2px solid var(--line2);background:var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:10px}
+#advbtn:active{background:var(--g3)}
+#advbtn .word{font-family:var(--f-disp);font-weight:700;font-size:20px;letter-spacing:.14em}
+#advbtn .sub{font-size:11px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;text-align:right;line-height:1.3;width:auto}
+
 /* GO/STOP */
 #gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
 #gostop .word{font-family:var(--f-disp);font-weight:700;font-size:56px;letter-spacing:.08em;line-height:1}
@@ -136,13 +143,13 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 @keyframes arm-pulse{0%,100%{filter:brightness(1);border-color:rgba(255,255,255,.35);box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{filter:brightness(1.35);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.18)}}
 
 /* left lower: patient card */
-#ptcard{border:2px solid var(--line);background:var(--g1);padding:14px 16px 12px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+#ptcard{border:2px solid var(--line);background:var(--g1);padding:12px 16px 10px;display:flex;flex-direction:column;gap:7px;min-height:0;overflow:hidden}
 #ptcard .lab{font-size:12px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
 #ptcard .conn{display:flex;align-items:center;gap:12px;height:30px}
 #ptcard .dot{width:16px;height:16px;border-radius:50%;flex:none}
 #ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:26px;letter-spacing:.1em;line-height:1}
 #ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;font-size:14px;margin-top:6px}
+#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:14px;margin-top:2px}
 #ptcard .kv dt{color:var(--ink2);margin:0;white-space:nowrap}
 #ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
 #ptcard.is-conn{border-color:var(--go)}
@@ -153,7 +160,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #ptcard.is-lost .word{color:#fbe9e2}
 #ptcard.is-lost .model,#ptcard.is-lost .kv dd{color:#fbe9e2}
 #ptcard.is-lost .kv dt,#ptcard.is-lost .lab{color:#f5cfc7}
-#simbtn{margin-top:auto;height:32px;border:1px dashed var(--line2);color:var(--ink3);font-size:11px;letter-spacing:.16em}
+#simbtn{margin-top:auto;height:28px;border:1px dashed var(--line2);color:var(--ink3);font-size:11px;letter-spacing:.16em}
 #simbtn:active{color:var(--ink)}
 
 /* outcome tiles */
@@ -357,6 +364,11 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* log */
 #log-body{overflow-y:auto;min-height:0}
+#adv-body{padding:24px 28px;overflow-y:auto}
+.adv-note{margin:0 0 16px;color:var(--ink2);font-size:15px}
+.adv-list{margin:0;padding:0;list-style:none;display:grid;gap:10px;max-width:760px}
+.adv-list li{border:1px solid var(--line);background:var(--g2);padding:12px 16px;font-size:15px;line-height:1.4}
+.adv-list li b{font-family:var(--f-disp);letter-spacing:.06em;margin-right:6px}
 #log-table{width:100%;border-collapse:collapse;font-size:14px}
 #log-table th{position:sticky;top:0;background:var(--g2);text-align:left;font-size:12px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:600}
 #log-table td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -412,6 +424,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         </dl>
         <button id="simbtn">SIM · DEMO SCENARIOS</button>
       </section>
+      <button id="advbtn"><span class="word">ADVANCED</span><span class="sub">Limits · alarms · setup</span></button>
       <button id="loopbox" class="is-running">
         <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span></span>
         <span class="zone switch"><span class="aword">SWITCH TO MANUAL</span><span class="hint"></span></span>
@@ -457,6 +470,27 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <ul id="alert-list"></ul>
       </section>
     </main>
+  </div>
+
+  <!-- advanced overlay (placeholder) -->
+  <div class="ovl" id="adv-ovl">
+    <div class="panel">
+      <div class="ph">
+        <div class="title">ADVANCED<small>Provider-level settings · not part of the medic default view</small></div>
+        <button class="closebtn" data-close="adv-ovl">CLOSE ✕</button>
+      </div>
+      <div id="adv-body">
+        <p class="adv-note">Placeholder. The content of this panel is the next design decision. Candidates:</p>
+        <ul class="adv-list">
+          <li><b>Controller limits</b> — FiO₂, PEEP, VT and RR ceilings and floors CLOVER may not cross</li>
+          <li><b>Alarm limits</b> — warning and critical thresholds for SpO₂ and etCO₂, separate from the targets</li>
+          <li><b>Override lockout</b> — the 5-minute hold, and whether emergency O₂ is exempt</li>
+          <li><b>Decision cycle</b> — the 30-second cadence and the out-of-range interrupt</li>
+          <li><b>Ventilator setup</b> — device selection, link test, vent mode, I:E, trigger</li>
+          <li><b>Screen layout</b> — the custom layout mode from the original brief</li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- log overlay -->
@@ -971,6 +1005,7 @@ $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2ar
   applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${OVERRIDE_HOLD/60} min unless released.`);
   evalAlerts(); render(); });
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); }));
+$('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened ADVANCED panel',''); });
 $('#logbtn').addEventListener('click',()=>{ $('#log-ovl').classList.add('open'); renderLog(); });
 $('#log-filter').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.logFilter=b.dataset.f; $('#log-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderLog(); });
 const LIGHT=['BRIGHT','DIM','RED'];

@@ -112,11 +112,14 @@ Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) ·
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button. The clock is a button that toggles
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
-Left column (268 px), rows **432 / 280 / 130**:
-1. **Ventilator card** (beside the vitals and summary rows): CONNECTED / LINK LOST with
-   dot, make and model (placeholder Zoll 731 EMV+), then link and rate, loop-mode-since
-   time, serial, vent mode, last command with time and acknowledgement, battery with
-   runtime, O₂ supply. Hosts the demo-only SIM button. Goes red and pulses on link loss.
+Left column (268 px), rows **354 / 64 / 280 / 130**:
+1. **Ventilator card** (beside the vitals): CONNECTED / LINK LOST with dot, make and model
+   (placeholder Zoll 731 EMV+), then link and rate, mode-since time, serial, vent mode,
+   last command with acknowledgement and time, battery with runtime, O₂ supply. Hosts the
+   demo-only SIM button. Goes critical red and pulses on link loss.
+1b. **ADVANCED** button (beside the summary row): opens the provider-level panel. Currently
+   a placeholder listing candidate contents (controller limits, alarm limits, override
+   lockout, decision cycle, ventilator setup, custom layout).
 2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
    tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
    the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
