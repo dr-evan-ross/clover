@@ -47,7 +47,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 /* top bar */
 #topbar{display:grid;grid-template-columns:268px 476px 231px 231px;gap:14px;height:76px}
 .tb{background:var(--g1);border:1px solid var(--line);display:flex;align-items:center;padding:0 14px;min-width:0;gap:10px}
-.tb-brand{padding:0 18px}
+.tb-brand{padding:0 18px;text-align:left}
+#dispbtn:active{background:var(--g2)}
 .tb-time{justify-content:center}
 .tb-time:active{background:var(--g2)}
 #tz-lab{white-space:nowrap}
@@ -69,8 +70,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #nextbox.idle{background:var(--g2);color:var(--ink3);cursor:default}
 #nextbox.idle .lab,#nextbox.idle .cd{color:var(--ink3)}
 .brand{display:flex;flex-direction:column;line-height:1}
-.brand .name{font-family:var(--f-disp);font-weight:700;font-size:30px;letter-spacing:.14em}
-.brand .sub{font-size:12px;letter-spacing:.1em;color:var(--ink2);text-transform:uppercase;margin-top:5px}
+.brand .name{font-family:var(--f-disp);font-weight:700;font-size:24px;letter-spacing:.12em;white-space:nowrap}
+.brand .sub{font-size:11px;letter-spacing:.1em;color:var(--ink2);text-transform:uppercase;margin-top:6px;white-space:nowrap}
 #ctrl-status{display:flex;flex-direction:column;justify-content:center;gap:4px;height:52px;overflow:hidden;min-width:0;width:100%}
 #ctrl-status .lab{font-size:11px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ctrl-status .val{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -401,7 +402,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
 <div id="stage" aria-live="off">
 
   <header id="topbar">
-    <div class="tb tb-brand"><div class="brand"><span class="name">CLOVER</span><span class="sub">Closed-loop O₂ · ventilation</span></div></div>
+    <button class="tb tb-brand" id="dispbtn"><div class="brand"><span class="name">CLOVER BASIC</span><span class="sub">Switch to advanced display</span></div></button>
     <div class="tb tb-ctrl"><div id="ctrl-status"><span class="lab" id="ctrl-lab">Controller</span><span class="val" id="ctrl-line">—</span></div><div id="runbox" class="cdbox"><span class="lab">Run time</span><span class="cd" id="elapsed"></span></div><button id="nextbox" class="cdbox" aria-label="Force a controller decision now"><span class="lab">Update ▸</span><span class="cd" id="next-cd"></span></button></div>
     <button class="tb tb-light" id="lightbtn" aria-label="Display brightness"><span class="lab">Display</span><span class="mode"><span id="light-badge">BRIGHT</span></span></button>
     <button class="tb tb-time" id="clockbtn" aria-label="Switch clock time zone"><div id="clock"><span id="clk"></span><small id="tz-lab">LOCAL · TAP FOR ZULU</small></div></button>
@@ -470,6 +471,26 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <ul id="alert-list"></ul>
       </section>
     </main>
+  </div>
+
+  <!-- advanced display (placeholder) -->
+  <div class="ovl" id="disp-ovl">
+    <div class="panel">
+      <div class="ph">
+        <div class="title">ADVANCED DISPLAY<small>Provider / RT view · not built yet</small></div>
+        <button class="closebtn" data-close="disp-ovl">BACK TO BASIC</button>
+      </div>
+      <div id="adv-body">
+        <p class="adv-note">Placeholder. The advanced display is the second default screen from the brief: the same grid and rules, denser information for a provider or respiratory therapist. Candidates:</p>
+        <ul class="adv-list">
+          <li><b>Trends visible by default</b> — SpO₂ and etCO₂ history alongside the live waveforms</li>
+          <li><b>Controller reasoning inline</b> — the last decision and its rationale on screen, not only in the log</li>
+          <li><b>More measured values</b> — compliance, resistance, auto-PEEP, VTi/VTe difference, driving pressure</li>
+          <li><b>Pressure and flow waveforms</b> from the ventilator</li>
+          <li><b>Direct access to targets, limits and alarm thresholds</b></li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- advanced overlay (placeholder) -->
@@ -1005,6 +1026,7 @@ $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2ar
   applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${OVERRIDE_HOLD/60} min unless released.`);
   evalAlerts(); render(); });
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); }));
+$('#dispbtn').addEventListener('click',()=>{ $('#disp-ovl').classList.add('open'); addLog('USER','Opened advanced display',''); });
 $('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened ADVANCED SETUP',''); });
 $('#logbtn').addEventListener('click',()=>{ $('#log-ovl').classList.add('open'); renderLog(); });
 $('#log-filter').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.logFilter=b.dataset.f; $('#log-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderLog(); });

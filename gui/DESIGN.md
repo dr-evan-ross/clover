@@ -108,7 +108,9 @@ Rules:
 
 ## 6. Layout (1280 × 990 stage, scaled to fit; letter-landscape proportions)
 
-Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
+Top bar (76 px), four boxes: display switch (268) · controller (476) · DISPLAY brightness
+(231) · clock (231). The display switch reads CLOVER BASIC / SWITCH TO ADVANCED DISPLAY and
+opens the advanced (provider) display, currently a placeholder panel.
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button. The clock is a button that toggles
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
