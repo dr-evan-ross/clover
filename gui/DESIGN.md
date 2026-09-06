@@ -114,8 +114,7 @@ Left column (268 px), rows **432 / 280 / 130**:
    dot, make and model (placeholder Zoll 731 EMV+), then link and rate, loop-mode-since
    time, serial, vent mode, last command with time and acknowledgement, battery with
    runtime, O₂ supply. Hosts the demo-only SIM button. Goes red and pulses on link loss.
-2. **Closed-loop tile** (one button, the height of the control tiles it governs): "Closed
-   loop" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
+2. **Mode tile** (one button, the height of the control tiles it governs): "Mode" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
    tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
    the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
    anywhere arms; second tap confirms; inert when STOPPED. State and control in one place.
