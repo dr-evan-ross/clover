@@ -105,23 +105,22 @@ Rules:
 
 ## 6. Layout (1280 × 990 stage, scaled to fit; letter-landscape proportions)
 
-Top bar (76 px), four boxes: ventilator (268) · controller (476) · DISPLAY (231) · clock (231).
+Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button. The clock is a button that toggles
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
-Left column (268 px), rows **726 / 130**:
-1. **Closed-loop tile** (one button, spanning the vitals, summary and controls rows). Its
-   upper zone (432, beside vitals + summary) is the status: "Closed loop" label · loop icon
-   · AUTO/MANUAL/STOPPED · since-time · description. Its lower zone (280, beside the
-   controls it governs, separated by a rule on the row line) is the switch: SWITCH TO
-   MANUAL / SWITCH TO AUTO with the action word in the *target* mode's colour; tapping
-   anywhere on the tile arms it, second tap confirms; inert when STOPPED. The tile is the
-   state and the control in one place, which is why it is not split.
-2. **START / STOP** button (beside alerts).
-
-The ventilator connection (CONNECTED / LINK LOST, battery, make and model, link type)
-lives in the top-left box of the top bar, above this column, together with the demo-only
-SIM button.
+Left column (268 px), rows **354 / 358 / 130**:
+1. **Ventilator card** (beside the vitals): CONNECTED / LINK LOST with dot, make and model
+   (placeholder Zoll 731 EMV+), then link and rate, serial, vent mode, last command with
+   time and acknowledgement, battery with runtime, O₂ supply. Hosts the demo-only SIM
+   button. Goes red and pulses on link loss.
+2. **Closed-loop tile** (one button, beside the summary and controls rows). Upper zone:
+   "Closed loop" label · rotating loop icon · AUTO/MANUAL/STOPPED · since-time. Lower zone,
+   on the controls row and separated by a rule: SWITCH TO MANUAL / SWITCH TO AUTO with the
+   action word in the *target* mode's colour, a two-line description, and the arm/confirm
+   hint. Tapping anywhere on the tile arms it; second tap confirms; inert when STOPPED.
+   The tile is the state and the control in one place, which is why it is not split.
+3. **START / STOP** button (beside alerts).
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
