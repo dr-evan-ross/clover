@@ -39,8 +39,8 @@ still.
 4. **Waveforms are always visible.** Each vital tile shows its live waveform (pleth under
    SpO₂, capnogram under etCO₂) beneath the number, as a sweeping trace with an erase bar
    like a bedside monitor, ~12 s across the tile. Assumed FDA requirement: a number is
-   only trustworthy if its waveform is. Signal loss shows a noisy flat pleth; ventilator
-   link loss shows an absent capnogram. This is patient movement and does not break rule 1.
+   only trustworthy if its waveform is. Probe loss shows a noisy flat pleth; ventilator
+   link loss drops both traces out entirely. This is patient movement and does not break rule 1.
 5. **Trends are hidden until asked for.** No sparklines, no inline trend arrows. A TREND
    button in each vital tile swaps the number and waveform for a chart of the same
    footprint (15 / 30 / 60 min). Never a full-screen overlay; the rest of the screen stays visible.
