@@ -109,17 +109,16 @@ Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) ·
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button. The clock is a button that toggles
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
-Left column (268 px), rows **354 / 358 / 130**:
-1. **Ventilator card** (beside the vitals): CONNECTED / LINK LOST with dot, make and model
-   (placeholder Zoll 731 EMV+), then link and rate, serial, vent mode, last command with
-   time and acknowledgement, battery with runtime, O₂ supply. Hosts the demo-only SIM
-   button. Goes red and pulses on link loss.
-2. **Closed-loop tile** (one button, beside the summary and controls rows). Upper zone:
-   "Closed loop" label · rotating loop icon · AUTO/MANUAL/STOPPED · since-time. Lower zone,
-   on the controls row and separated by a rule: SWITCH TO MANUAL / SWITCH TO AUTO with the
-   action word in the *target* mode's colour, a two-line description, and the arm/confirm
-   hint. Tapping anywhere on the tile arms it; second tap confirms; inert when STOPPED.
-   The tile is the state and the control in one place, which is why it is not split.
+Left column (268 px), rows **432 / 280 / 130**:
+1. **Ventilator card** (beside the vitals and summary rows): CONNECTED / LINK LOST with
+   dot, make and model (placeholder Zoll 731 EMV+), then link and rate, loop-mode-since
+   time, serial, vent mode, last command with time and acknowledgement, battery with
+   runtime, O₂ supply. Hosts the demo-only SIM button. Goes red and pulses on link loss.
+2. **Closed-loop tile** (one button, the height of the control tiles it governs). Upper
+   zone: "Closed loop" label · rotating loop icon · AUTO/MANUAL/STOPPED. Lower zone,
+   separated by a rule: SWITCH TO MANUAL / SWITCH TO AUTO with the action word in the
+   *target* mode's colour and the arm/confirm hint. Tapping anywhere arms; second tap
+   confirms; inert when STOPPED. State and control in one place.
 3. **START / STOP** button (beside alerts).
 
 Right column, rows **354 / 64 / 280 / 130**:

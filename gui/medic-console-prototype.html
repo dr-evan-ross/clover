@@ -88,21 +88,21 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* body */
 #body{display:grid;grid-template-columns:268px 1fr;gap:14px;min-height:0}
-#left{display:grid;grid-template-rows:354px 358px 130px;gap:14px;min-height:0}
+#left{display:grid;grid-template-rows:432px 280px 130px;gap:14px;min-height:0}
 #left>*{width:268px;max-width:268px;min-width:0;height:100%;justify-self:stretch;overflow:hidden;align-self:stretch}
 #left .sub,#left .lab,#left .word,#left .asub,#left .lab2,#left .aword{width:100%}
 #right{display:grid;grid-template-rows:354px 64px 280px 130px;gap:14px;min-height:0}
 #right>*{min-height:0;overflow:hidden}
 
 /* closed-loop tile: status zone (beside vitals + summary) over switch zone (beside controls) */
-#loopbox{border:2px solid;display:grid;grid-template-rows:178px 1fr;text-align:center;padding:0}
+#loopbox{border:2px solid;display:grid;grid-template-rows:132px 1fr;text-align:center;padding:0}
 #loopbox .zone{display:grid;justify-items:center;align-content:center;padding:0 16px;min-height:0}
-#loopbox .zone.status{grid-template-rows:14px 76px 40px 14px;gap:8px}
-#loopbox .zone.switch{grid-template-rows:14px 40px 40px 18px;gap:8px;border-top:2px solid;border-color:inherit}
+#loopbox .zone.status{grid-template-rows:12px 60px 36px;gap:6px}
+#loopbox .zone.switch{grid-template-rows:12px 36px 16px;gap:8px;border-top:2px solid;border-color:inherit}
 #loopbox .lab,#loopbox .lab2{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.8}
-#loopbox .word,#loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:40px;letter-spacing:.1em;line-height:1;display:flex;align-items:center;justify-content:center}
-#loopbox .icon-row{height:76px;display:flex;align-items:center;justify-content:center}
-#loopbox .loopicon{width:70px;height:70px;flex:none;overflow:visible}
+#loopbox .word,#loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:36px;letter-spacing:.1em;line-height:1;display:flex;align-items:center;justify-content:center}
+#loopbox .icon-row{height:60px;display:flex;align-items:center;justify-content:center}
+#loopbox .loopicon{width:56px;height:56px;flex:none;overflow:visible}
 #loopbox .arrows{transform-box:view-box;transform-origin:50% 50%;animation:spin 30s steps(30,end) infinite;animation-play-state:paused}
 #loopbox .slash,#loopbox .slash-halo{display:none;stroke-linecap:round}
 #loopbox .slash{stroke:currentColor;stroke-width:3.2}
@@ -122,7 +122,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox.is-halted .zone.switch{opacity:.55;cursor:default}
 #loopbox.is-running:active .zone.switch,#loopbox.is-manual:active .zone.switch{filter:brightness(1.25)}
 #loopbox.armed{animation:arm-pulse 1.2s ease-in-out infinite}
-#loopbox.armed .aword{font-size:32px}
+#loopbox.armed .aword{font-size:30px}
 
 /* GO/STOP */
 #gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
@@ -143,7 +143,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #ptcard .dot{width:16px;height:16px;border-radius:50%;flex:none}
 #ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:26px;letter-spacing:.1em;line-height:1}
 #ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;margin-top:4px}
+#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:9px 12px;font-size:14px;margin-top:6px}
 #ptcard .kv dt{color:var(--ink2);margin:0;white-space:nowrap}
 #ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #ptcard.is-conn{border-color:var(--go)}
@@ -403,6 +403,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <div class="model">ZOLL 731 EMV+</div>
         <dl class="kv">
           <dt>Link</dt><dd id="vent-meta">USB serial · 1 Hz</dd>
+          <dt>Loop mode since</dt><dd id="vent-since">—</dd>
           <dt>Serial</dt><dd>731-04182</dd>
           <dt>Vent mode</dt><dd>AC (V)</dd>
           <dt>Last command</dt><dd id="vent-cmd">—</dd>
@@ -412,8 +413,8 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <button id="simbtn">SIM · DEMO SCENARIOS</button>
       </section>
       <button id="loopbox" class="is-running">
-        <span class="zone status"><span class="lab">Closed loop</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span><span class="since"></span></span>
-        <span class="zone switch"><span class="lab2">Switch to</span><span class="aword">MANUAL</span><span class="asub"></span><span class="hint"></span></span>
+        <span class="zone status"><span class="lab">Closed loop</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span></span>
+        <span class="zone switch"><span class="lab2">Switch to</span><span class="aword">MANUAL</span><span class="hint"></span></span>
       </button>
       <button id="gostop" class="is-running"><span class="word">STOP</span><span class="sub"></span></button>
     </aside>
@@ -815,16 +816,15 @@ function renderTop(){
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
   $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `no data for ${cellsHTML(mmss(S.t-L.lostAt))}`;
+  $('#vent-since').textContent = !S.running ? 'stopped ' + hm(S.startT + S.runSince*1000) : hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
   $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} · ${hm(S.startT+S.lastCmd.t*1000)} · OK` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
   lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO';
-  lb.querySelector('.since').textContent = !S.running ? 'stopped at ' + hm(S.startT + S.runSince*1000) : 'since ' + hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.classList.toggle('armed', mArmed);
   lb.querySelector('.lab2').textContent = mArmed ? 'Confirm' : 'Switch to';
   lb.querySelector('.aword').textContent = S.mode==='AUTO' ? (mArmed ? 'MANUAL?' : 'MANUAL') : (mArmed ? 'AUTO?' : 'AUTO');
-  lb.querySelector('.asub').textContent = !S.running ? 'Mode can be changed once the loop is started.' : S.mode==='AUTO' ? 'You take control of all four settings. CLOVER will only suggest.' : 'CLOVER resumes adjusting all four settings.';
   lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START FIRST' : 'TAP · THEN CONFIRM';
   $('#s-ie').textContent = IE[S.ie];
   const ie=$('#ie-tile'); ie.classList.toggle('editing', !!S.ieEdit);
