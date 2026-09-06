@@ -41,7 +41,13 @@ still.
    (15 / 30 / 60 min). Never a full-screen overlay; the rest of the screen stays visible.
 5. **Everything the controller does is logged with its reasoning.** So is every user
    action, every alert onset and clearance, and every armed-but-not-confirmed tap.
-6. **One strict grid.** The top bar is split into boxes matching the columns beneath.
+6. **Who is in charge of each setting is always explicit.** Every control tile carries an
+   ownership band across its top and a matching colour scheme: green "CLOVER IN CONTROL"
+   when the controller may change it (AUTO, running, no override); amber "YOU · …" when
+   only the operator can (MANUAL, an active override with its countdown, or STOPPED).
+   Who set the value *last* is deliberately not shown on the tile, only the set time,
+   because it is easily confused with who is in charge *now*. The log has the history.
+7. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are
    explicit pixels; nothing is "the remainder".
 
@@ -110,8 +116,8 @@ Right column, rows **290 / 84 / 300 / 154**:
    85–97, high 88–100, gap ≥ 2; etCO₂ low 25–50, high 30–60, gap ≥ 4. Changes are logged.
 2. **Summary row** (read-only): Ppeak · Pplat · I:E · MVe · VTe · Leak.
 3. **Controls**: FiO₂ · PEEP · VT · RR, i.e. oxygenation pair under SpO₂, ventilation pair
-   under etCO₂. Each: name (identity colour), unit, value, − / +, reserved aux row
-   (APPLY/CANCEL, or SUGGESTS…, or RETURN TO CLOVER), source chip + set time.
+   under etCO₂. Each: ownership band, name (identity colour), unit, value, − / +, reserved
+   aux row (APPLY/CANCEL, or SUGGESTS…, or RETURN TO CLOVER), set time.
 4. **Alerts band**: severity counts and LOG button on the left; alert rows with severity
    stripe, timestamp and ACK on the right. Shows NO ACTIVE ALERTS when quiet.
 
