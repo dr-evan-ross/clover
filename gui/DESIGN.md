@@ -105,19 +105,23 @@ Rules:
 
 ## 6. Layout (1280 × 990 stage, scaled to fit; letter-landscape proportions)
 
-Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
-The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button.
-The brand box also hosts the demo-only SIM button. The clock is a button that toggles
+Top bar (76 px), four boxes: ventilator (268) · controller (476) · DISPLAY (231) · clock (231).
+The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button. The clock is a button that toggles
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
-Left column (268 px), rows **354 / 64 / 280 / 130** (each beside its right-column row):
-1. **Status tile** (display only): "Closed loop" label · loop icon · AUTO/MANUAL/STOPPED ·
-   since-time · two-line description.
-2. **Ventilator strip**: CONNECTED / LINK LOST, battery, make and model (placeholder
-   Zoll 731 EMV+), link type.
-3. **Mode switch** (button, beside the controls it governs): shows the *action*,
-   SWITCH TO MANUAL (amber) or SWITCH TO AUTO (green); arm + confirm; inert when STOPPED.
-4. **START / STOP** button.
+Left column (268 px), rows **726 / 130**:
+1. **Closed-loop tile** (one button, spanning the vitals, summary and controls rows). Its
+   upper zone (432, beside vitals + summary) is the status: "Closed loop" label · loop icon
+   · AUTO/MANUAL/STOPPED · since-time · description. Its lower zone (280, beside the
+   controls it governs, separated by a rule on the row line) is the switch: SWITCH TO
+   MANUAL / SWITCH TO AUTO with the action word in the *target* mode's colour; tapping
+   anywhere on the tile arms it, second tap confirms; inert when STOPPED. The tile is the
+   state and the control in one place, which is why it is not split.
+2. **START / STOP** button (beside alerts).
+
+The ventilator connection (CONNECTED / LINK LOST, battery, make and model, link type)
+lives in the top-left box of the top bar, above this column, together with the demo-only
+SIM button.
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
