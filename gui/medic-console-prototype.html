@@ -59,6 +59,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .cdbox .cd{font-family:var(--f-disp);font-weight:700;font-size:24px;line-height:1}
 .cdbox .cd .c{display:inline-block;width:.64em;text-align:center}
 .cdbox .cd .c.sep{width:.34em}
+.cd-cells .c{display:inline-block;width:.6em;text-align:center}
+.cd-cells .c.sep{width:.28em}
 #nextbox{border-color:var(--line2);background:var(--g3)}
 #nextbox:active{background:var(--g4)}
 #nextbox .lab{color:var(--ink)}
@@ -700,7 +702,7 @@ function renderAlerts(){
   box.className = crit?'has-crit':warn?'has-warn':'';
   $('#alert-cnt').innerHTML = S.alerts.length ? `<b>${crit}</b> critical<br><b>${warn}</b> warning<br><b>${S.alerts.length-crit-warn}</b> info` : 'None active';
   const sig = S.alerts.map(a=>a.id+':'+a.sev+':'+(a.ack?1:0)).join('|');
-  if (sig === alertSig){ list.querySelectorAll('.alert').forEach((li,i)=>{ const a=S.alerts[i]; if(a) li.querySelector('.m').textContent=a.txt; }); return; }
+  if (sig === alertSig){ list.querySelectorAll('.alert').forEach((li,i)=>{ const a=S.alerts[i]; if(a){ const h=cellsHTML(a.txt); const m=li.querySelector('.m'); if (m.innerHTML!==h) m.innerHTML=h; } }); return; }
   alertSig = sig;
   list.innerHTML='';
   if (!S.alerts.length){ const li=document.createElement('li'); li.className='none'; li.textContent='NO ACTIVE ALERTS'; list.appendChild(li); return; }
@@ -708,7 +710,7 @@ function renderAlerts(){
     const li=document.createElement('li'); li.className=`alert sev-${a.sev}${a.ack?' ack':''}`;
     li.innerHTML = `<span class="stripe"></span><span class="txt"><span class="sev"></span><span class="m"></span></span><span class="since"></span><button class="ackbtn"></button>`;
     li.querySelector('.sev').textContent = a.sev==='crit'?'CRITICAL':a.sev.toUpperCase();
-    li.querySelector('.m').textContent = a.txt;
+    li.querySelector('.m').innerHTML = cellsHTML(a.txt);
     li.querySelector('.since').textContent = hms(S.startT + a.since*1000);
     const b=li.querySelector('.ackbtn'); b.textContent = a.ack?'ACK\u2019D':'ACK';
     b.addEventListener('click', () => { if(!a.ack){ a.ack=true; addLog('USER',`Acknowledged: ${a.txt}`,''); render(); } });
@@ -744,7 +746,7 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
     const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').textContent = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `YOU · ${mmss(ov)} LEFT` : owner==='user' ? 'YOU · MANUAL' : 'YOU · CLOVER STOPPED';
+    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `YOU · ${cellsHTML(mmss(ov))} LEFT` : owner==='user' ? 'YOU · MANUAL' : 'YOU · CLOVER STOPPED';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
     el.querySelector('.was').textContent = p ? `NOW ${P[k].fmt(S.vent[k])} · APPLY TO CONFIRM` : '\u00a0';
     const linked = S.vent_link.connected;
@@ -752,7 +754,7 @@ function renderControls(){
     el.querySelector('.inc').disabled = !linked || (p?p.v:S.vent[k]) >= P[k].max - 1e-9;
     el.querySelector('.apply').disabled = !linked;
     if (sg!=null) el.querySelector('.take').textContent = `SUGGESTS ${P[k].fmt(sg)} · TAP TO LOAD`;
-    if (ov>0) el.querySelector('.release').textContent = `RETURN TO CLOVER · ${mmss(ov)}`;
+    if (ov>0) el.querySelector('.release').innerHTML = `RETURN TO CLOVER · ${cellsHTML(mmss(ov))}`;
     el.querySelector('.t').textContent = sb.t ? `set ${hm(S.startT+sb.t*1000)}` : 'initial setting';
   });
 }
@@ -777,21 +779,22 @@ function renderTop(){
   const pc=$('#ptcard'), L=S.vent_link;
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
-  $('#vent-meta').textContent = L.connected ? 'USB serial · SN 731-04182 · streaming' : `USB serial · no data for ${mmss(S.t-L.lostAt)}`;
+  $('#vent-meta').innerHTML = L.connected ? 'USB serial · SN 731-04182 · streaming' : `USB serial · no data for ${cellsHTML(mmss(S.t-L.lostAt))}`;
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.className = (!S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running') + (mArmed ? ' armed' : '');
   lb.querySelector('.wt').textContent = mArmed ? (S.mode==='AUTO' ? 'GO MANUAL?' : 'GO AUTO?') : (!S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO');
   lb.querySelector('.since').textContent = !S.running ? 'stopped at ' + hm(S.startT + S.runSince*1000) : 'since ' + hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
   lb.querySelector('.sub').textContent = !S.running ? 'Settings held. No automatic changes until START.' : manual ? 'You set the ventilator. CLOVER only suggests.' : 'CLOVER adjusts FiO₂ · PEEP · VT · RR. You can override any value.';
-  lb.querySelector('.hint').textContent = mArmed ? `TAP AGAIN TO CONFIRM · ${mLeft}` : !S.running ? 'PRESS START TO RESUME' : manual ? 'TAP TO SWITCH TO AUTO' : 'TAP TO SWITCH TO MANUAL';
+  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START TO RESUME' : manual ? 'TAP TO SWITCH TO AUTO' : 'TAP TO SWITCH TO MANUAL';
   const gs=$('#gostop');
   const armed = S.gsArm!=null, left = armed ? Math.ceil((5000 - (performance.now()-S.gsArm))/1000) : 0;
   gs.className = (S.running ? 'is-running' : 'is-stopped') + (armed ? ' armed' : '');
   gs.querySelector('.word').textContent = armed ? (S.running ? 'STOP?' : 'START?') : (S.running ? 'STOP' : 'START');
-  gs.querySelector('.sub').textContent = armed ? `Tap again to confirm · ${left}` : (S.running ? 'Stop CLOVER. Vent keeps current settings.' : 'Resume closed-loop control.');
+  gs.querySelector('.sub').innerHTML = armed ? `Tap again to confirm · ${cellsHTML(left)}` : (S.running ? 'Stop CLOVER. Vent keeps current settings.' : 'Resume closed-loop control.');
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cellsHTML = t => esc(String(t)).replace(/\d+(?::\d{2})?/g, m => '<span class="cd-cells">' + [...m].map(ch => `<span class="c${ch===':'?' sep':''}">${ch}</span>`).join('') + '</span>');
 
 function render(){ renderTop(); renderVitals(); renderAlerts(); renderControls(); if ($('#log-ovl').classList.contains('open')) renderLog(); }
 
