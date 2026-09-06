@@ -117,7 +117,7 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
    (placeholder Zoll 731 EMV+), then link and rate, mode-since time, serial, vent mode,
    last command with acknowledgement and time, battery with runtime, O₂ supply. Hosts the
    demo-only SIM button. Goes critical red and pulses on link loss.
-1b. **ADVANCED** button (beside the summary row): opens the provider-level panel. Currently
+1b. **ADVANCED SETUP** button (beside the summary row): opens the provider-level panel. Currently
    a placeholder listing candidate contents (controller limits, alarm limits, override
    lockout, decision cycle, ventilator setup, custom layout).
 2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the

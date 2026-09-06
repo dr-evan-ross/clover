@@ -127,7 +127,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 /* ADVANCED */
 #advbtn{border:2px solid var(--line2);background:var(--g2);display:flex;align-items:center;justify-content:space-between;padding:0 16px;gap:10px}
 #advbtn:active{background:var(--g3)}
-#advbtn .word{font-family:var(--f-disp);font-weight:700;font-size:20px;letter-spacing:.14em}
+#advbtn .word{font-family:var(--f-disp);font-weight:700;font-size:17px;letter-spacing:.12em;white-space:nowrap}
 #advbtn .sub{font-size:11px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;text-align:right;line-height:1.3;width:auto}
 
 /* GO/STOP */
@@ -424,7 +424,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         </dl>
         <button id="simbtn">SIM · DEMO SCENARIOS</button>
       </section>
-      <button id="advbtn"><span class="word">ADVANCED</span><span class="sub">Limits · alarms · setup</span></button>
+      <button id="advbtn"><span class="word">ADVANCED SETUP</span><span class="sub">Limits · alarms</span></button>
       <button id="loopbox" class="is-running">
         <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span></span>
         <span class="zone switch"><span class="aword">SWITCH TO MANUAL</span><span class="hint"></span></span>
@@ -476,7 +476,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
   <div class="ovl" id="adv-ovl">
     <div class="panel">
       <div class="ph">
-        <div class="title">ADVANCED<small>Provider-level settings · not part of the medic default view</small></div>
+        <div class="title">ADVANCED SETUP<small>Provider-level settings · not part of the medic default view</small></div>
         <button class="closebtn" data-close="adv-ovl">CLOSE ✕</button>
       </div>
       <div id="adv-body">
@@ -1005,7 +1005,7 @@ $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2ar
   applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${OVERRIDE_HOLD/60} min unless released.`);
   evalAlerts(); render(); });
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); }));
-$('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened ADVANCED panel',''); });
+$('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened ADVANCED SETUP',''); });
 $('#logbtn').addEventListener('click',()=>{ $('#log-ovl').classList.add('open'); renderLog(); });
 $('#log-filter').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.logFilter=b.dataset.f; $('#log-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderLog(); });
 const LIGHT=['BRIGHT','DIM','RED'];
