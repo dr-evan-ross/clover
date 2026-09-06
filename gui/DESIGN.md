@@ -48,7 +48,8 @@ still.
    action, every alert onset and clearance, and every armed-but-not-confirmed tap.
 7. **Who is in charge of each setting is always explicit.** Every control tile carries an
    ownership band across its top and a matching colour scheme: green "CLOVER IN CONTROL"
-   when the controller may change it (AUTO, running, no override); amber "YOU · …" when
+   when the controller may change it (AUTO, running, no override); amber "USER IN CONTROL" (with
+   the override countdown or "· STOPPED" appended) when
    only the operator can (MANUAL, an active override with its countdown, or STOPPED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.

@@ -283,7 +283,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 /* controls */
 #controls{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:280px;gap:14px;min-height:0}
 .ctl{border:2px solid var(--line);background:var(--g1);display:grid;grid-template-rows:22px 24px minmax(0,1fr) 48px 40px 18px;padding:0 14px 10px;gap:6px;position:relative;min-height:0;height:280px;overflow:hidden}
-.ctl .owner{margin:0 -14px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.16em}
+.ctl .owner{margin:0 -14px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:11px;letter-spacing:.12em;white-space:nowrap}
 .ctl.own-clover{border-color:#4d8a2f;background:#0f180c}
 .ctl.own-clover .owner{background:#245a1a;color:#d4f2c0}
 .ctl.own-user{border-color:#a5842a;background:#1a1508}
@@ -748,7 +748,7 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
     const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `YOU · ${cellsHTML(mmss(ov))} LEFT` : owner==='user' ? 'YOU · MANUAL' : 'YOU · CLOVER STOPPED';
+    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : owner==='user' ? 'USER IN CONTROL' : 'USER IN CONTROL · STOPPED';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
     el.querySelector('.was').textContent = p ? `NOW ${P[k].fmt(S.vent[k])} · APPLY TO CONFIRM` : '\u00a0';
     const linked = S.vent_link.connected;
