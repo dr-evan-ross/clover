@@ -115,9 +115,9 @@ Left column (268 px), rows **432 / 280 / 130**:
    time, serial, vent mode, last command with time and acknowledgement, battery with
    runtime, O₂ supply. Hosts the demo-only SIM button. Goes red and pulses on link loss.
 2. **Closed-loop tile** (one button, the height of the control tiles it governs): "Closed
-   loop" label · rotating loop icon · AUTO/MANUAL/STOPPED · an outlined action line,
-   SWITCH TO MANUAL / SWITCH TO AUTO, in the *target* mode's colour (fills solid and reads
-   CONFIRM … while armed) · the arm/confirm hint. No rule, no "Switch to" label. Tapping
+   loop" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
+   tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
+   the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
    anywhere arms; second tap confirms; inert when STOPPED. State and control in one place.
 3. **START / STOP** button (beside alerts).
 
