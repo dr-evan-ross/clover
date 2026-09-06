@@ -62,7 +62,7 @@ still.
 | Use | Never |
 |---|---|
 | AUTO, MANUAL, STOPPED | AUTOMATIC, MANUAL MODE, HALTED |
-| START, STOP | GO |
+| START, EMERGENCY STOP | GO, HALT |
 | UPDATE (force a decision) | DECIDE NOW |
 | BRIGHT, DIM, RED (display) | DAY, LIGHT |
 | RETURN TO CLOVER (release override) | — |
@@ -126,7 +126,9 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
    tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
    the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
    anywhere arms; second tap confirms; inert when STOPPED. State and control in one place.
-3. **START / STOP** button (beside alerts).
+3. **EMERGENCY STOP / START** button (beside alerts). Reads EMERGENCY over STOP while
+   running, START when stopped; no explanatory text. Arm + confirm like the other
+   state changes; the confirm countdown is the only text that appears.
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip

@@ -132,9 +132,11 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #advbtn .sub{font-size:11px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;text-align:right;line-height:1.3;width:auto}
 
 /* GO/STOP */
-#gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+#gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#gostop .pre{font-family:var(--f-disp);font-weight:700;font-size:18px;letter-spacing:.24em;line-height:1;height:18px}
+#gostop.is-stopped .pre{visibility:hidden}
 #gostop .word{font-family:var(--f-disp);font-weight:700;font-size:56px;letter-spacing:.08em;line-height:1}
-#gostop .sub{font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-align:center;line-height:1.4;padding:0 14px;height:34px;overflow:hidden}
+#gostop .sub{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-align:center;line-height:18px;padding:0 14px;height:18px;overflow:hidden}
 #gostop.is-running{background:linear-gradient(180deg,#a03a28,#7a2818);border-color:#d6614a;color:#fbe9e2}
 #gostop.is-running:active{background:#b7402c}
 #gostop.is-stopped{background:linear-gradient(180deg,#5b9838,#3c6c25);border-color:#8fcf6a;color:#eefae3}
@@ -430,7 +432,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span></span>
         <span class="zone switch"><span class="aword">SWITCH TO MANUAL</span><span class="hint"></span></span>
       </button>
-      <button id="gostop" class="is-running"><span class="word">STOP</span><span class="sub"></span></button>
+      <button id="gostop" class="is-running"><span class="pre">EMERGENCY</span><span class="word">STOP</span><span class="sub"></span></button>
     </aside>
 
         <main id="right">
@@ -888,7 +890,7 @@ function renderTop(){
   const armed = S.gsArm!=null, left = armed ? Math.ceil((5000 - (performance.now()-S.gsArm))/1000) : 0;
   gs.className = (S.running ? 'is-running' : 'is-stopped') + (armed ? ' armed' : '');
   gs.querySelector('.word').textContent = armed ? (S.running ? 'STOP?' : 'START?') : (S.running ? 'STOP' : 'START');
-  gs.querySelector('.sub').innerHTML = armed ? `Tap again to confirm · ${cellsHTML(left)}` : (S.running ? 'Stop CLOVER. Vent keeps current settings.' : 'Resume closed-loop control.');
+  gs.querySelector('.sub').innerHTML = armed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(left)}` : '';
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cellsHTML = t => esc(String(t)).replace(/\d+(?::\d{2})?/g, m => '<span class="cd-cells">' + [...m].map(ch => `<span class="c${ch===':'?' sep':''}">${ch}</span>`).join('') + '</span>');
