@@ -1,0 +1,146 @@
+# CLOVER GUI — Design Rules and Decisions
+
+CLOVER (Closed Loop Oxygenation and Ventilation for Resuscitation) is a physiological
+closed-loop controller. It reads SpO₂ and etCO₂, decides what to change on the ventilator
+(VT, RR, PEEP, FiO₂), and sends those commands. The controller is treated as complete;
+this folder is the GUI work.
+
+This file records every design decision made for the first screen, the **68W combat medic
+console**, so later screens (provider/RT view, custom layout) inherit them without
+re-deriving anything. Decisions were made with the product owner on 2026-09-05 and 06.
+
+Prototype: `gui/medic-console-prototype.html` (standalone, fonts embedded, works offline,
+contains a simulated patient and a copy of the controller logic).
+Live copy: https://claude.ai/code/artifact/36cc1857-265e-48fb-bb69-dfe3d6dfe321
+
+---
+
+## 1. Who it's for, and the governing principle
+
+The default screen targets a 68W combat medic under stress, on a touchscreen no larger
+than a sheet of paper, possibly at night. The owner's words: *"I'm trying not to overwhelm
+my joes."* Every rule below serves that. When in doubt, remove, hide behind a tap, or hold
+still.
+
+## 2. Hard rules (do not break these on any screen)
+
+1. **Nothing moves unless the patient moved.** Every box is a fixed size regardless of
+   its text or state. Space for conditional controls (APPLY/CANCEL, suggestion chips,
+   release buttons, confirm buttons) is permanently reserved and only made visible.
+2. **Digits never jitter.** Every changing number renders one character per fixed-width
+   cell (the display font has no tabular figures). Vital displays are also smoothed: a
+   ~5 s moving average, and the shown integer only changes once the average has moved
+   0.75 past it.
+3. **No single touch changes anything.** START/STOP, AUTO/MANUAL and emergency FiO₂ all
+   arm on the first tap and act on a second tap within 5 s (8 s for O₂). Ventilator
+   adjustments are pending until APPLY, and discard themselves after 12 s.
+   Exception: UPDATE (force a controller decision) is single-tap, because the controller
+   would take the same action within 30 s anyway.
+4. **Trends are hidden until asked for.** No sparklines, no inline trend arrows. A TREND
+   button in each vital tile swaps the number for a chart of the same footprint
+   (15 / 30 / 60 min). Never a full-screen overlay; the rest of the screen stays visible.
+5. **Everything the controller does is logged with its reasoning.** So is every user
+   action, every alert onset and clearance, and every armed-but-not-confirmed tap.
+6. **One strict grid.** The top bar is split into boxes matching the columns beneath.
+   Left-column row heights equal right-column row heights exactly. All row heights are
+   explicit pixels; nothing is "the remainder".
+
+## 3. Vocabulary
+
+| Use | Never |
+|---|---|
+| AUTO, MANUAL, STOPPED | AUTOMATIC, MANUAL MODE, HALTED |
+| START, STOP | GO |
+| UPDATE (force a decision) | DECIDE NOW |
+| BRIGHT, DIM, RED (display) | DAY, LIGHT |
+| RETURN TO CLOVER (release override) | — |
+| Units only on control tiles: %, cmH₂O, mL, /min | prefixes like "O₂ ·" or "CO₂ ·" |
+
+## 4. Colour
+
+Tactical low-light palette, single theme (always dark).
+
+| Token | Hex | Use |
+|---|---|---|
+| ground | `#080b07` | page |
+| panel | `#0f140d` | tiles |
+| raised | `#161d13` / `#1f281b` / `#2a3625` | buttons, chips |
+| line | `#2a3625` / `#3a4834` | borders |
+| ink | `#d3dac6` / `#8d9a7e` / `#5b6850` | text, secondary, muted |
+| go / auto | `#5f9e3b` | AUTO state, START, connected, in-range band |
+| warn | `#d5a02c` | MANUAL state, out-of-range fill, APPLY, overrides |
+| crit / stop | `#d84b38` / `#b7402c` | STOPPED, critical fill, STOP button, CONFIRM |
+| info | `#6d9ab8` | informational alerts, signal loss |
+| SpO₂ identity | `#7fc4e6` (cyan) | SpO₂ number/label, FiO₂ and PEEP names, SpO₂ trend line |
+| etCO₂ identity | `#f0dc7a` (yellow) | etCO₂ number/label, VT and RR names, etCO₂ trend line |
+
+Rules:
+- Identity colours are constant. **The number never changes colour with state.**
+- State is shown by the **whole tile filling**: amber `#4b3309` for out of range, red
+  `#5e1b11` pulsing for critical, blue `#132433` dashed for signal lost. A corner pill
+  (OUT OF RANGE / CRITICAL / NO SIGNAL) carries the state in words too.
+- Armed controls share one smooth pulse: brightness 1 → 1.35 and border fading to white
+  with a soft halo, 1.2 s ease-in-out. Never a stepped blink.
+- Display modes: BRIGHT (normal), DIM (55% black overlay), RED (red multiply overlay,
+  desaturated). Only RED is tinted on the DISPLAY button.
+
+## 5. Type
+
+- Display / numerics / headings: **Chakra Petch** 500–700
+- UI text: **Barlow** 400–700
+- Log and timestamps: **IBM Plex Mono** 400–500
+- All three are embedded in the standalone file as WOFF2 data URIs (SIL OFL).
+
+## 6. Layout (1280 × 990 stage, scaled to fit; letter-landscape proportions)
+
+Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
+The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button.
+
+Left column (268 px), rows **388 / 300 / 154**:
+1. **Mode tile** (button): "Closed loop" label · loop icon · AUTO/MANUAL/STOPPED ·
+   since-time · two-line description · prompt (TAP TO SWITCH… / PRESS START TO RESUME).
+2. **Ventilator card**: CONNECTED / LINK LOST, make and model (placeholder Zoll 731 EMV+),
+   link type and serial, battery, O₂ supply. Also hosts the demo-only SIM button.
+3. **START / STOP** button.
+
+Right column, rows **290 / 84 / 300 / 154**:
+1. **SpO₂** and **etCO₂** tiles (target range, big number, TREND button bottom-right;
+   SpO₂ also has FiO₂ → 100% + CONFIRM bottom-left).
+2. **Summary row** (read-only): Ppeak · Pplat · I:E · MVe · VTe · Leak.
+3. **Controls**: FiO₂ · PEEP · VT · RR, i.e. oxygenation pair under SpO₂, ventilation pair
+   under etCO₂. Each: name (identity colour), unit, value, − / +, reserved aux row
+   (APPLY/CANCEL, or SUGGESTS…, or RETURN TO CLOVER), source chip + set time.
+4. **Alerts band**: severity counts and LOG button on the left; alert rows with severity
+   stripe, timestamp and ACK on the right. Shows NO ACTIVE ALERTS when quiet.
+
+## 7. The loop icon
+
+Three arc arrows (72° each) chasing around a circle. In AUTO it steps 12° once per
+second (30 s per revolution, matching the decision cycle). In MANUAL and STOPPED the
+rotation is **paused, not removed**, so the angle is preserved across mode changes, and a
+diagonal slash (with a halo in the tile's background colour) cuts through it. The rotation
+is applied to the arrows only; the slash never rotates.
+
+## 8. Controller interaction rules (as implemented in the prototype)
+
+- Decision cycle: 30 s. Oxygenation first (FiO₂, then PEEP), then ventilation (RR, then VT).
+- **Out-of-range interrupt**: a value leaving target, escalating warn→crit, or losing
+  signal triggers an immediate decision and restarts the cycle. Edge-triggered only.
+- **UPDATE** button forces a decision immediately.
+- **MANUAL**: controller computes and logs advisories, posts SUGGESTS chips, applies nothing.
+- **STOPPED**: controller does nothing; ventilator holds current settings.
+- **User override**: locks that parameter against the controller for 5 min, shown as a
+  countdown; RETURN TO CLOVER cancels it early and forces an immediate decision.
+- **Emergency O₂**: FiO₂ → 100% from the SpO₂ tile, arm + CONFIRM, works in any mode,
+  counts as an override.
+- **Ventilator link lost**: critical alert, controller holds and logs, all adjustment
+  controls disabled, emergency O₂ refused and logged.
+
+## 9. Not yet built
+
+- Provider / RT screen (denser: waveforms or trends visible by default, more numbers,
+  reasoning inline).
+- Custom layout mode (choose which tiles show, within the same fixed grid).
+- Interface contract for the real controller's data and decision stream, replacing the
+  simulator.
+- Replace the Zoll 731 EMV+ placeholder with the actual target ventilator.
