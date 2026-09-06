@@ -36,18 +36,23 @@ still.
    adjustments are pending until APPLY, and discard themselves after 12 s.
    Exception: UPDATE (force a controller decision) is single-tap, because the controller
    would take the same action within 30 s anyway.
-4. **Trends are hidden until asked for.** No sparklines, no inline trend arrows. A TREND
-   button in each vital tile swaps the number for a chart of the same footprint
-   (15 / 30 / 60 min). Never a full-screen overlay; the rest of the screen stays visible.
-5. **Everything the controller does is logged with its reasoning.** So is every user
+4. **Waveforms are always visible.** Each vital tile shows its live waveform (pleth under
+   SpO₂, capnogram under etCO₂) beneath the number, as a sweeping trace with an erase bar
+   like a bedside monitor, ~12 s across the tile. Assumed FDA requirement: a number is
+   only trustworthy if its waveform is. Signal loss shows a noisy flat pleth; ventilator
+   link loss shows an absent capnogram. This is patient movement and does not break rule 1.
+5. **Trends are hidden until asked for.** No sparklines, no inline trend arrows. A TREND
+   button in each vital tile swaps the number and waveform for a chart of the same
+   footprint (15 / 30 / 60 min). Never a full-screen overlay; the rest of the screen stays visible.
+6. **Everything the controller does is logged with its reasoning.** So is every user
    action, every alert onset and clearance, and every armed-but-not-confirmed tap.
-6. **Who is in charge of each setting is always explicit.** Every control tile carries an
+7. **Who is in charge of each setting is always explicit.** Every control tile carries an
    ownership band across its top and a matching colour scheme: green "CLOVER IN CONTROL"
    when the controller may change it (AUTO, running, no override); amber "YOU · …" when
    only the operator can (MANUAL, an active override with its countdown, or STOPPED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
-7. **One strict grid.** The top bar is split into boxes matching the columns beneath.
+8. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are
    explicit pixels; nothing is "the remainder".
 
@@ -102,15 +107,16 @@ Rules:
 Top bar (76 px), four boxes: brand (268) · controller (476) · DISPLAY (231) · clock (231).
 The controller box holds the status text, a RUN TIME box, and the UPDATE countdown button.
 
-Left column (268 px), rows **388 / 300 / 154**:
+Left column (268 px), rows **432 / 280 / 130**:
 1. **Mode tile** (button): "Closed loop" label · loop icon · AUTO/MANUAL/STOPPED ·
    since-time · two-line description · prompt (TAP TO SWITCH… / PRESS START TO RESUME).
 2. **Ventilator card**: CONNECTED / LINK LOST, make and model (placeholder Zoll 731 EMV+),
    link type and serial, battery, O₂ supply. Also hosts the demo-only SIM button.
 3. **START / STOP** button.
 
-Right column, rows **290 / 84 / 300 / 154**:
-1. **SpO₂** and **etCO₂** tiles (target range button, big number, TREND button bottom-right;
+Right column, rows **354 / 64 / 280 / 130**:
+1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
+   beneath it, TREND button bottom-right;
    SpO₂ also has FiO₂ → 100% + CONFIRM bottom-left). Tapping the target opens an in-tile
    editor (low / high with − / +, APPLY TARGET / CANCEL, 20 s timeout). Limits: SpO₂ low
    85–97, high 88–100, gap ≥ 2; etCO₂ low 25–50, high 30–60, gap ≥ 4. Changes are logged.
@@ -152,3 +158,4 @@ is applied to the arrows only; the slash never rotates.
 - Interface contract for the real controller's data and decision stream, replacing the
   simulator.
 - Replace the Zoll 731 EMV+ placeholder with the actual target ventilator.
+- A signal-quality index beside each waveform, so "janky" is not left to judgment.
