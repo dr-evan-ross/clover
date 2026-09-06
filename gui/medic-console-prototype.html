@@ -157,7 +157,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .vital{border:2px solid var(--line);background:var(--g1);display:grid;grid-template-columns:1fr;grid-template-rows:1fr 56px;gap:10px;padding:14px 20px 14px;text-align:left;position:relative;transition:border-color .2s}
 .vital .face{display:grid;grid-template-rows:32px 1fr 22px;gap:6px;min-height:0}
 .vital .body{position:relative;min-height:0;display:grid;grid-template-rows:minmax(0,1fr) 90px;gap:4px}
-.vital .wave{grid-row:2;width:100%;height:90px;display:block;border-top:1px solid rgba(255,255,255,.08)}
+.vital .wave{grid-row:2;width:100%;height:90px;display:block;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.22)}
 .vital.trending .wave,.vital.editing .wave{display:none}
 .vital .tsvg{display:none;position:absolute;inset:0;width:100%;height:100%;touch-action:none}
 .vital.trending .tsvg{display:block}
@@ -960,26 +960,35 @@ function waveSample(k, t){
   else if (ph < 0.667) y = et*(0.92 + 0.08*(ph-0.05)/0.617);                       // phase III plateau, slight slope
   else if (ph < 0.70) y = et*(1 - (ph-0.667)/0.033);                                // inspiratory fall
   else y = 0.005;
-  return 0.06 + 0.9*clamp(y,0,1);
+  return clamp(y,0,1);
 }
 function drawWaves(now){
   for (const k of ['spo2','etco2']){
     const w = waves[k]; if (!w) continue;
     const dt = Math.min(0.25, (now - w.last)/1000); w.last = now;
     const tile = $('#v-'+k); if (tile.classList.contains('trending') || tile.classList.contains('editing')) continue;
+    const x0 = k==='etco2' ? 52 : 0, PW = w.W - x0;
     const nx = w.x + dt*WAVE.sweep;
-    for (let i=Math.floor(w.x); i<nx; i++){ const xi = ((i % w.W) + w.W) % w.W; w.cols[xi] = waveSample(k, now/1000 - (nx - i)/WAVE.sweep); }
-    w.x = nx % w.W;
-    const ctx=w.ctx, W=w.W, H=w.H, x=Math.floor(w.x);
+    for (let i=Math.floor(w.x); i<nx; i++){ const xi = x0 + (((i % PW) + PW) % PW); w.cols[xi] = waveSample(k, now/1000 - (nx - i)/WAVE.sweep); }
+    w.x = nx % PW;
+    const ctx=w.ctx, W=w.W, H=w.H, x=x0+Math.floor(w.x);
     ctx.clearRect(0,0,W,H);
+    const yOf = v => H - 8 - v*(H-16);
+    if (k==='etco2'){
+      const [lo,hi]=TGT.etco2;
+      ctx.fillStyle='rgba(95,158,59,.16)'; ctx.fillRect(x0, yOf(hi/70), PW, yOf(lo/70)-yOf(hi/70));   // target band
+      ctx.strokeStyle='rgba(255,255,255,.14)'; ctx.lineWidth=1; ctx.font='600 19px Barlow, sans-serif'; ctx.fillStyle='rgba(211,218,198,.75)'; ctx.textAlign='right'; ctx.textBaseline='middle';
+      for (const v of [0,20,40,60]){ const y=Math.round(yOf(v/70))+.5; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(W,y); ctx.stroke(); ctx.fillText(String(v), x0-8, y); }
+      ctx.textAlign='left'; ctx.textBaseline='top'; ctx.font='600 16px Barlow, sans-serif'; ctx.fillStyle='rgba(211,218,198,.55)'; ctx.fillText('mmHg', x0+8, 4);
+    }
     ctx.lineWidth = 3; ctx.lineJoin='round'; ctx.lineCap='round';
     ctx.strokeStyle = getComputedStyle(tile).getPropertyValue(k==='spo2'?'--spo2':'--etco2').trim() || '#fff';
     ctx.beginPath(); let pen=false;
-    for (let i=0;i<W;i++){
-      const inGap = ((i - x + W) % W) < WAVE.gap;                                   // erase bar just ahead of the sweep
+    for (let i=x0;i<W;i++){
+      const inGap = ((i - x + PW) % PW) < WAVE.gap;                                   // erase bar just ahead of the sweep
       const v = w.cols[i];
       if (inGap || Number.isNaN(v)){ pen=false; continue; }
-      const y = H - 6 - v*(H-12);
+      const y = yOf(v);
       if (!pen){ ctx.moveTo(i,y); pen=true; } else ctx.lineTo(i,y);
     }
     ctx.stroke();
