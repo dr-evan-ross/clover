@@ -204,10 +204,27 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .vital.st-lost .target,.vital.st-lost .hint{color:#b9cfe0}
 #v-spo2 .num,#v-spo2 .name{color:var(--spo2)}
 #v-etco2 .num,#v-etco2 .name{color:var(--etco2)}
-.vital .head{display:flex;align-items:center;justify-content:space-between}
+.vital .head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .vital .name{font-family:var(--f-disp);font-weight:600;font-size:26px;letter-spacing:.06em}
 .vital .name sub{font-size:16px;vertical-align:baseline;position:relative;top:4px}
-.vital .target{font-size:13px;letter-spacing:.12em;color:var(--ink2);text-transform:uppercase}
+.vital .target{font-size:13px;letter-spacing:.12em;color:var(--ink2);text-transform:uppercase;height:28px;padding:0 10px;border:1px solid var(--line2);background:var(--g2)}
+.vital .target:active{background:var(--g3)}
+.vital.editing .target{background:var(--warn);border-color:var(--warn);color:var(--warn-ink)}
+.vital.editing .target b{color:var(--warn-ink)}
+.vital .tedit{display:none;position:absolute;inset:0;grid-template-columns:1fr 1fr;grid-template-rows:1fr 40px;gap:8px 14px}
+.vital.editing .tedit{display:grid}
+.vital.editing .num,.vital.editing .tsvg,.vital.editing .tip{display:none!important}
+.vital .tedit .col{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:0}
+.vital .tedit .lab{font-size:11px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
+.vital .tedit .row{display:grid;grid-template-columns:56px 84px 56px;align-items:center}
+.vital .tedit .row b{font-family:var(--f-disp);font-weight:700;font-size:44px;text-align:center;font-variant-numeric:tabular-nums;color:var(--warn)}
+.vital .tedit .row button{height:52px;border:1px solid var(--line2);background:var(--g2);font-family:var(--f-disp);font-size:30px;font-weight:600;line-height:1}
+.vital .tedit .row button:active{background:var(--g3)}
+.vital .tedit .row button:disabled{opacity:.3}
+.vital .tedit .act{grid-column:1/3;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vital .tedit .act button{height:40px;border:1px solid var(--line2);font-family:var(--f-disp);font-weight:700;letter-spacing:.12em;font-size:14px}
+.vital .tedit .tcancel{background:var(--g2)}
+.vital .tedit .tapply{background:var(--warn);color:var(--warn-ink);border-color:var(--warn)}
 .vital .target b{color:var(--ink);font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums}
 .vital .num{font-family:var(--f-disp);font-weight:700;font-size:130px;line-height:.9;align-self:center;justify-self:center;letter-spacing:-.02em;white-space:nowrap;display:flex;align-items:baseline;font-variant-numeric:tabular-nums}
 .vital .num .n{display:inline-flex}
@@ -369,8 +386,8 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <div class="vital" id="v-spo2" data-k="spo2">
           <span class="stpill"></span>
           <div class="face">
-            <div class="head"><span class="name">SpO<sub>2</sub><span class="mini"></span></span><span class="target">Target <b>92–96</b> %</span><span class="seg win" data-k="spo2"><button data-w="15" class="on">15 MIN</button><button data-w="30">30</button><button data-w="60">60</button></span></div>
-            <div class="body"><span class="num"><span class="n"><span class="d"></span><span class="d"></span><span class="d"></span></span><span class="unit">%</span></span><svg class="tsvg" role="img" aria-label="spo2 trend"></svg><div class="tip"></div></div>
+            <div class="head"><span class="name">SpO<sub>2</sub><span class="mini"></span></span><button class="target" data-k="spo2">Target <b>92–96</b> %</button><span class="seg win" data-k="spo2"><button data-w="15" class="on">15 MIN</button><button data-w="30">30</button><button data-w="60">60</button></span></div>
+            <div class="body"><span class="num"><span class="n"><span class="d"></span><span class="d"></span><span class="d"></span></span><span class="unit">%</span></span><svg class="tsvg" role="img" aria-label="spo2 trend"></svg><div class="tip"></div><div class="tedit"><div class="col"><span class="lab">Low</span><div class="row"><button class="tb-dec" data-e="lo">−</button><b class="lo"></b><button class="tb-inc" data-e="lo">+</button></div></div><div class="col"><span class="lab">High</span><div class="row"><button class="tb-dec" data-e="hi">−</button><b class="hi"></b><button class="tb-inc" data-e="hi">+</button></div></div><div class="act"><button class="tcancel">CANCEL</button><button class="tapply">APPLY TARGET</button></div></div></div>
             <div class="foot"><span class="hint"></span></div>
           </div>
           <div class="o2row"><button class="o2" id="o2btn">FiO₂ → 100%</button><button class="o2c" id="o2confirm">CONFIRM</button><button class="trendbtn" data-k="spo2">TREND</button></div>
@@ -378,8 +395,8 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <div class="vital" id="v-etco2" data-k="etco2">
           <span class="stpill"></span>
           <div class="face">
-            <div class="head"><span class="name">etCO<sub>2</sub><span class="mini"></span></span><span class="target">Target <b>35–45</b> mmHg</span><span class="seg win" data-k="etco2"><button data-w="15" class="on">15 MIN</button><button data-w="30">30</button><button data-w="60">60</button></span></div>
-            <div class="body"><span class="num"><span class="n"><span class="d"></span><span class="d"></span><span class="d"></span></span><span class="unit">mmHg</span></span><svg class="tsvg" role="img" aria-label="etco2 trend"></svg><div class="tip"></div></div>
+            <div class="head"><span class="name">etCO<sub>2</sub><span class="mini"></span></span><button class="target" data-k="etco2">Target <b>35–45</b> mmHg</button><span class="seg win" data-k="etco2"><button data-w="15" class="on">15 MIN</button><button data-w="30">30</button><button data-w="60">60</button></span></div>
+            <div class="body"><span class="num"><span class="n"><span class="d"></span><span class="d"></span><span class="d"></span></span><span class="unit">mmHg</span></span><svg class="tsvg" role="img" aria-label="etco2 trend"></svg><div class="tip"></div><div class="tedit"><div class="col"><span class="lab">Low</span><div class="row"><button class="tb-dec" data-e="lo">−</button><b class="lo"></b><button class="tb-inc" data-e="lo">+</button></div></div><div class="col"><span class="lab">High</span><div class="row"><button class="tb-dec" data-e="hi">−</button><b class="hi"></b><button class="tb-inc" data-e="hi">+</button></div></div><div class="act"><button class="tcancel">CANCEL</button><button class="tapply">APPLY TARGET</button></div></div></div>
             <div class="foot"><span class="hint"></span></div>
           </div>
           <div class="o2row"><span></span><span></span><button class="trendbtn" data-k="etco2">TREND</button></div>
@@ -454,6 +471,8 @@ const P = {
 };
 const ORDER = ['fio2','peep','vt','rr'];   // oxygenation pair under SpO₂, ventilation pair under etCO₂
 const TGT = { spo2:[92,96], etco2:[35,45] };
+const TLIM = { spo2:{ lo:[85,97], hi:[88,100], gap:2, unit:'%' }, etco2:{ lo:[25,50], hi:[30,60], gap:4, unit:'mmHg' } };
+const TEDIT_TIMEOUT = 20;   // s before an unconfirmed target edit is discarded
 const DECISION_PERIOD = 30;      // s between controller decisions
 const OVERRIDE_HOLD = 300;       // s the controller honors a user override
 const PENDING_TIMEOUT = 12;      // s before an unconfirmed adjustment cancels
@@ -466,7 +485,7 @@ const S = {
   patient:{ shunt:0.12, vco2:200, signal:true, signalUntil:0 },
   vent_link:{ connected:true, lostAt:0, until:0 },
   spo2:96, etco2:40, f:{spo2:96, etco2:40}, shown:{spo2:96, etco2:40}, hist:[], log:[], alerts:[],
-  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, flash:true,
+  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, flash:true,
 };
 ORDER.forEach(k => { S.setBy[k] = {src:'SYS', t:0}; S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; });
 
@@ -614,6 +633,7 @@ function evalAlerts(){
 function tick(){
   S.t += 1;
   stepPatient();
+  ['spo2','etco2'].forEach(k => { const e=S.tedit[k]; if (e && S.t - e.at > TEDIT_TIMEOUT){ S.tedit[k]=null; addLog('SYS', `${k==='spo2'?'SpO₂':'etCO₂'} target edit discarded`, 'Not applied within 20 s.'); } });
   ORDER.forEach(k => { const p=S.pending[k]; if (p && S.t - p.at > PENDING_TIMEOUT){ S.pending[k]=null; addLog('SYS', `${P[k].plain} adjustment discarded`, 'Not confirmed within 12 s.'); } });
   /* out-of-range interrupt: a value leaving target, or escalating, triggers an immediate decision */
   const rank = {ok:0, lost:1, warn:1, crit:2}, worse = [];
@@ -652,6 +672,11 @@ function renderVitals(){
     const str = (st==='lost' ? '--' : String(S.shown[k])).padStart(3,' ');
     el.querySelectorAll('.d').forEach((d,i) => { if (d.textContent !== str[i]) d.textContent = str[i]; });
     el.querySelector('.stpill').textContent = st==='crit'?'CRITICAL':st==='warn'?'OUT OF RANGE':st==='lost'?'NO SIGNAL':'';
+    const te=S.tedit[k]; el.classList.toggle('editing', !!te);
+    el.querySelector('.target b').textContent = `${TGT[k][0]}–${TGT[k][1]}`;
+    if (te){ const L=TLIM[k]; el.querySelector('.tedit .lo').textContent=te.lo; el.querySelector('.tedit .hi').textContent=te.hi;
+      el.querySelector('.tb-dec[data-e=lo]').disabled = te.lo<=L.lo[0]; el.querySelector('.tb-inc[data-e=lo]').disabled = te.lo>=Math.min(L.lo[1], te.hi-L.gap);
+      el.querySelector('.tb-dec[data-e=hi]').disabled = te.hi<=Math.max(L.hi[0], te.lo+L.gap); el.querySelector('.tb-inc[data-e=hi]').disabled = te.hi>=L.hi[1]; }
     const tr=S.trend[k]; el.classList.toggle('trending', tr.on);
     el.querySelector('.mini').textContent = tr.on ? (st==='lost'?'--':String(S.shown[k])) + (k==='spo2'?' %':' mmHg') : '';
     el.querySelector('.hint').textContent = tr.on ? '▲ CLOVER change · ▲ user change · drag chart to read' : '';
@@ -868,6 +893,19 @@ $('#loopbox').addEventListener('click', ()=>{
   ORDER.forEach(k=>S.suggest[k]=null);
   addLog('USER',`Mode → ${S.mode==='AUTO'?'AUTOMATIC':'MANUAL'}`, S.mode==='AUTO'?'Controller will apply its decisions.':'Controller will compute and log recommendations but not apply them.');
   S.lastDecision=S.t-DECISION_PERIOD; evalAlerts(); render();
+});
+document.querySelectorAll('.vital .target').forEach(b=>b.addEventListener('click',()=>{ const k=b.dataset.k; S.tedit[k] = S.tedit[k] ? null : { lo:TGT[k][0], hi:TGT[k][1], at:S.t }; render(); }));
+document.querySelectorAll('.vital .tedit').forEach(ed=>{
+  const k=ed.closest('.vital').dataset.k;
+  ed.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const te=S.tedit[k]; if(!te) return; const L=TLIM[k];
+    if (b.classList.contains('tcancel')){ S.tedit[k]=null; render(); return; }
+    if (b.classList.contains('tapply')){
+      const from=`${TGT[k][0]}–${TGT[k][1]}`; TGT[k]=[te.lo, te.hi]; S.tedit[k]=null;
+      addLog('USER', `${k==='spo2'?'SpO₂':'etCO₂'} target ${from} → ${te.lo}–${te.hi} ${L.unit}`, 'Operator changed the target range. Controller evaluates against the new range from its next decision; a value now outside it triggers an immediate decision.');
+      evalAlerts(); render(); return; }
+    const d = b.classList.contains('tb-inc') ? 1 : -1; te.at=S.t;
+    if (b.dataset.e==='lo') te.lo = clamp(te.lo+d, L.lo[0], Math.min(L.lo[1], te.hi-L.gap)); else te.hi = clamp(te.hi+d, Math.max(L.hi[0], te.lo+L.gap), L.hi[1]);
+    render(); });
 });
 document.querySelectorAll('.vital .trendbtn').forEach(b=>b.addEventListener('click',()=>{ const k=b.dataset.k; S.trend[k].on=!S.trend[k].on; S.hover[k]=null; render(); }));
 document.querySelectorAll('.vital .win').forEach(w=>w.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.trend[w.dataset.k].win=+b.dataset.w; render(); }));

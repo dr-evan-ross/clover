@@ -104,8 +104,10 @@ Left column (268 px), rows **388 / 300 / 154**:
 3. **START / STOP** button.
 
 Right column, rows **290 / 84 / 300 / 154**:
-1. **SpO₂** and **etCO₂** tiles (target range, big number, TREND button bottom-right;
-   SpO₂ also has FiO₂ → 100% + CONFIRM bottom-left).
+1. **SpO₂** and **etCO₂** tiles (target range button, big number, TREND button bottom-right;
+   SpO₂ also has FiO₂ → 100% + CONFIRM bottom-left). Tapping the target opens an in-tile
+   editor (low / high with − / +, APPLY TARGET / CANCEL, 20 s timeout). Limits: SpO₂ low
+   85–97, high 88–100, gap ≥ 2; etCO₂ low 25–50, high 30–60, gap ≥ 4. Changes are logged.
 2. **Summary row** (read-only): Ppeak · Pplat · I:E · MVe · VTe · Leak.
 3. **Controls**: FiO₂ · PEEP · VT · RR, i.e. oxygenation pair under SpO₂, ventilation pair
    under etCO₂. Each: name (identity colour), unit, value, − / +, reserved aux row
