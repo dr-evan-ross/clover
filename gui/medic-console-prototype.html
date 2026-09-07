@@ -928,7 +928,7 @@ function renderTop(){
   const armed = S.gsArm!=null, left = armed ? Math.ceil((5000 - (performance.now()-S.gsArm))/1000) : 0;
   gs.className = (S.running ? 'is-running' : 'is-stopped') + (armed ? ' armed' : '');
   gs.querySelector('.word').textContent = armed ? (S.running ? 'DISENGAGE?' : 'ENGAGE?') : (S.running ? 'DISENGAGE' : 'ENGAGE');
-  gs.querySelector('.sub').innerHTML = armed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(left)}` : (S.running ? 'Releases the vent to its own controls.<br>Ventilation continues.' : 'Reads settings from the vent.<br>Resumes in MANUAL.');
+  gs.querySelector('.sub').innerHTML = armed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(left)}` : (S.running ? 'Releases the vent to its own controls.<br>Ventilation continues.' : 'Reads settings from the vent.<br>CLOVER takes control in FULL AUTO.');
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cellsHTML = t => esc(String(t)).replace(/\d+(?::\d{2})?/g, m => '<span class="cd-cells">' + [...m].map(ch => `<span class="c${ch===':'?' sep':''}">${ch}</span>`).join('') + '</span>');
@@ -1033,8 +1033,8 @@ $('#gostop').addEventListener('click', ()=>{
   S.gsArm=null;
   S.running=!S.running; S.runSince=S.t;
   const settings = ['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ');
-  if (S.running){ S.mode='MANUAL'; S.modeSince=S.t; ORDER.forEach(k=>{ S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; }); S.lastDecision=S.t-DECISION_PERIOD;
-    addLog('USER','ENGAGE — CLOVER re-engaged in MANUAL', `Settings read back from the ventilator: ${settings}. CLOVER advises only until the operator switches to AUTO.`); }
+  if (S.running){ S.mode='AUTO'; S.modeSince=S.t; ORDER.forEach(k=>{ S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; }); S.lastDecision=S.t-DECISION_PERIOD;
+    addLog('USER','ENGAGE — CLOVER in control', `Settings read back from the ventilator: ${settings}. FULL AUTO; first decision immediately.`); }
   else { ORDER.forEach(k=>{ S.pending[k]=null; }); S.o2arm=null; S.modeArm=null;
     addLog('USER','DISENGAGE — CLOVER released the ventilator', `No further commands or advisories from CLOVER. Ventilator continues on its own front-panel controls at: ${settings}.`); }
   evalAlerts(); render();

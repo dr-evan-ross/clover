@@ -145,7 +145,7 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
    is deliberately different from SWITCH TO MANUAL (the medic drives the vent through
    this screen while CLOVER watches and suggests). One line of effect text is shown:
    "Releases the vent to its own controls. Ventilation continues." ENGAGE reads the
-   settings back from the vent and resumes in MANUAL. Arm + confirm.
+   settings back from the vent and puts CLOVER straight into FULL AUTO, deciding at once. Arm + confirm.
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
