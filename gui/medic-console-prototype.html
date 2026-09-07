@@ -345,7 +345,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .ctl .aux button{height:40px;font-family:var(--f-disp);font-weight:700;letter-spacing:.12em;font-size:15px;border:1px solid var(--line2);visibility:hidden}
 .ctl .aux button:disabled{opacity:.35}
 .ctl.pending .aux .apply,.ctl.pending .aux .cancel{visibility:visible}
-.ctl .aux .apply{background:var(--warn);color:var(--warn-ink);border-color:var(--warn)}
+.ctl .aux .apply{background:var(--warn);color:var(--warn-ink);border-color:var(--warn);font-size:14px}
 .ctl .aux .cancel{background:var(--g2)}
 .ctl .aux .take{grid-column:1/3;background:#1c2a3a;color:#a9cbe6;border-color:#2f4a63;font-size:13px;letter-spacing:.08em;display:none}
 .ctl.has-sugg:not(.pending) .aux .take{display:block;visibility:visible}
@@ -684,7 +684,7 @@ function applyChange(k, to, src, detail){
   S.lastCmd = { what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t };
   if (src === 'USER'){
     S.override[k] = { until: S.t + OVERRIDE_HOLD };
-    addLog('USER', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || `Manual adjustment by operator in ${S.mode} mode. Controller will not adjust ${P[k].plain} for ${OVERRIDE_HOLD/60} min.`);
+    addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${OVERRIDE_HOLD/60} min unless released.` : `Manual adjustment by operator (${S.running ? 'MANUAL mode' : 'loop stopped'}); sent to the ventilator.`));
   } else {
     addLog('CTRL', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail);
   }
@@ -850,9 +850,10 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
     const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
+    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
-    el.querySelector('.was').textContent = p ? `NOW ${P[k].fmt(S.vent[k])} · APPLY TO CONFIRM` : '\u00a0';
+    el.querySelector('.was').textContent = p ? (owner==='clover' ? `TAKES ${P[k].plain} FROM CLOVER · ${OVERRIDE_HOLD/60} MIN` : `NOW ${P[k].fmt(S.vent[k])} · SENDS TO VENT`) : '\u00a0';
+    el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
     el.querySelector('.inc').disabled = !linked || (p?p.v:S.vent[k]) >= P[k].max - 1e-9;

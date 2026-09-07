@@ -53,6 +53,11 @@ still.
    only the operator can (MANUAL, an active override with its countdown, or STOPPED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
+   **The ± contract is stated before it is accepted:** on a CLOVER-controlled setting, a
+   pending adjustment shows "TAKES RR FROM CLOVER · 5 MIN", the band previews
+   "CLOVER IN CONTROL → USER?", and the confirm button reads OVERRIDE, not APPLY. On a
+   user-controlled setting (MANUAL, existing override, STOPPED) it reads "SENDS TO VENT"
+   with an APPLY button. So ± never silently starts an override.
 8. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are
    explicit pixels; nothing is "the remainder".
