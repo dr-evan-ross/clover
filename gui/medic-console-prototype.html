@@ -320,7 +320,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* controls */
 #controls{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:280px;gap:14px;min-height:0}
-.ctl{border:2px solid var(--line);background:var(--g1);display:grid;grid-template-rows:22px 24px minmax(0,1fr) 48px 40px 18px;padding:0 14px 10px;gap:6px;position:relative;min-height:0;height:280px;overflow:hidden}
+.ctl{border:2px solid var(--line);background:var(--g1);display:grid;grid-template-rows:22px 24px minmax(0,1fr) 16px 48px 40px 18px;padding:0 14px 10px;gap:6px;position:relative;min-height:0;height:280px;overflow:hidden}
 .ctl .owner{margin:0 -14px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:11px;letter-spacing:.12em;white-space:nowrap}
 .ctl.own-clover{border-color:#4d8a2f;background:#0f180c}
 .ctl.own-clover .owner{background:#245a1a;color:#d4f2c0}
@@ -336,7 +336,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .ctl .unit{font-size:13px;letter-spacing:.1em;color:var(--ink2);text-transform:uppercase}
 .ctl .num{font-family:var(--f-disp);font-weight:700;font-size:58px;line-height:1;text-align:center;align-self:center;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .ctl.pending .num{color:var(--warn)}
-.ctl .num .was{display:block;font-size:12px;font-weight:500;letter-spacing:.1em;color:var(--ink2);font-family:var(--f-ui);margin-top:4px;height:14px;line-height:14px}
+.ctl .contract{font-family:var(--f-disp);font-weight:600;font-size:11px;letter-spacing:.1em;color:var(--ink2);text-align:center;white-space:nowrap;line-height:16px}
+.ctl.pending .contract{color:var(--warn)}
 .ctl .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ctl .btns button{height:48px;border:1px solid var(--line2);background:rgba(255,255,255,.05);font-family:var(--f-disp);font-size:34px;font-weight:600;line-height:1}
 .ctl .btns button:active{background:var(--g3)}
@@ -380,6 +381,16 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .adv-list{margin:0;padding:0;list-style:none;display:grid;gap:10px;max-width:760px}
 .adv-list li{border:1px solid var(--line);background:var(--g2);padding:12px 16px;font-size:15px;line-height:1.4}
 .adv-list li b{font-family:var(--f-disp);letter-spacing:.06em;margin-right:6px}
+.cfg-row{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;border:1px solid var(--line2);background:var(--g2);padding:14px 18px;max-width:760px;margin-bottom:22px}
+.cfg-lab b{display:block;font-family:var(--f-disp);font-size:17px;letter-spacing:.06em;margin-bottom:4px}
+.cfg-lab span{font-size:13px;color:var(--ink2);line-height:1.4}
+.cfg-ctl{display:grid;grid-template-columns:52px 96px 52px 96px;gap:8px;align-items:center}
+.cfg-ctl button{height:52px;border:1px solid var(--line2);background:var(--g1);font-family:var(--f-disp);font-weight:600;font-size:26px}
+.cfg-ctl button:disabled{opacity:.3}
+.cfg-ctl .cfg-apply{font-size:14px;letter-spacing:.12em;background:var(--warn);color:var(--warn-ink);border-color:var(--warn);visibility:hidden}
+.cfg-row.dirty .cfg-apply{visibility:visible}
+.cfg-ctl .cfg-val{font-family:var(--f-disp);font-weight:700;font-size:26px;text-align:center;font-variant-numeric:tabular-nums}
+.cfg-row.dirty .cfg-val{color:var(--warn)}
 #log-table{width:100%;border-collapse:collapse;font-size:14px}
 #log-table th{position:sticky;top:0;background:var(--g2);text-align:left;font-size:12px;letter-spacing:.14em;color:var(--ink2);text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:600}
 #log-table td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -511,11 +522,15 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <button class="closebtn" data-close="adv-ovl">CLOSE ✕</button>
       </div>
       <div id="adv-body">
-        <p class="adv-note">Placeholder. The content of this panel is the next design decision. Candidates:</p>
+        <div class="cfg-row" id="cfg-ovr">
+          <div class="cfg-lab"><b>Override lockout</b><span>How long a user adjustment keeps a setting from CLOVER before control returns automatically. Applies to new overrides; RETURN TO CLOVER still ends one early.</span></div>
+          <div class="cfg-ctl"><button class="cfg-dec">−</button><b class="cfg-val"></b><button class="cfg-inc">+</button><button class="cfg-apply">APPLY</button></div>
+        </div>
+        <p class="adv-note">Still placeholders below. Candidates for this panel:</p>
         <ul class="adv-list">
           <li><b>Controller limits</b> — FiO₂, PEEP, VT and RR ceilings and floors CLOVER may not cross</li>
           <li><b>Alarm limits</b> — warning and critical thresholds for SpO₂ and etCO₂, separate from the targets</li>
-          <li><b>Override lockout</b> — the 5-minute hold, and whether emergency O₂ is exempt</li>
+          <li><b>Emergency O₂ exemption</b> — whether FiO₂ 100% is exempt from the lockout</li>
           <li><b>Decision cycle</b> — the 30-second cadence and the out-of-range interrupt</li>
           <li><b>Ventilator setup</b> — device selection, link test, vent mode, I:E, trigger</li>
           <li><b>Screen layout</b> — the custom layout mode from the original brief</li>
@@ -582,7 +597,7 @@ const TLIM = { spo2:{ lo:[85,97], hi:[88,100], gap:2, unit:'%' }, etco2:{ lo:[25
 const TEDIT_TIMEOUT = 20;   // s before an unconfirmed target edit is discarded
 const IE = ['1:1','1:1.5','1:2','1:2.5','1:3','1:4'];
 const DECISION_PERIOD = 30;      // s between controller decisions
-const OVERRIDE_HOLD = 300;       // s the controller honors a user override
+const OVR = () => S.cfg.overrideMin*60;   // s the controller honors a user override (set in SETUP)
 const PENDING_TIMEOUT = 12;      // s before an unconfirmed adjustment cancels
 
 /* ---------------- state ---------------- */
@@ -593,7 +608,7 @@ const S = {
   patient:{ shunt:0.12, vco2:200, signal:true, signalUntil:0 },
   vent_link:{ connected:true, lostAt:0, until:0 },
   spo2:96, etco2:40, f:{spo2:96, etco2:40}, shown:{spo2:96, etco2:40}, hist:[], log:[], alerts:[],
-  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, ie:2, ieEdit:null, lastCmd:null, flash:true,
+  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, ie:2, ieEdit:null, lastCmd:null, cfg:{ overrideMin:5 }, cfgEdit:null, flash:true,
 };
 ORDER.forEach(k => { S.setBy[k] = {src:'SYS', t:0}; S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; });
 
@@ -683,8 +698,8 @@ function applyChange(k, to, src, detail){
   S.setBy[k] = { src, t:S.t };
   S.lastCmd = { what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t };
   if (src === 'USER'){
-    S.override[k] = { until: S.t + OVERRIDE_HOLD };
-    addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${OVERRIDE_HOLD/60} min unless released.` : `Manual adjustment by operator (${S.running ? 'MANUAL mode' : 'loop stopped'}); sent to the ventilator.`));
+    S.override[k] = { until: S.t + OVR() };
+    addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${S.cfg.overrideMin} min unless released.` : `Manual adjustment by operator (${S.running ? 'MANUAL mode' : 'loop stopped'}); sent to the ventilator.`));
   } else {
     addLog('CTRL', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail);
   }
@@ -827,7 +842,8 @@ function buildControls(){
   ORDER.forEach(k => {
     const el=document.createElement('div'); el.className='ctl'; el.id='c-'+k;
     el.innerHTML = `<div class="owner"><span class="who"></span></div><div class="head"><span class="name">${P[k].name}</span><span class="unit">${P[k].unit}</span></div>
-      <div class="num"><span class="v"></span><span class="was"></span></div>
+      <div class="num"><span class="v"></span></div>
+      <div class="contract"></div>
       <div class="btns"><button class="dec" aria-label="Decrease ${P[k].plain}">−</button><button class="inc" aria-label="Increase ${P[k].plain}">+</button></div>
       <div class="aux"><button class="cancel">CANCEL</button><button class="apply">APPLY</button><button class="take"></button><button class="release"></button></div>
       <div class="foot"><span></span><span class="t"></span></div>`;
@@ -852,7 +868,9 @@ function renderControls(){
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
     el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
-    el.querySelector('.was').textContent = p ? (owner==='clover' ? `TAKES ${P[k].plain} FROM CLOVER · ${OVERRIDE_HOLD/60} MIN` : `NOW ${P[k].fmt(S.vent[k])} · SENDS TO VENT`) : '\u00a0';
+    el.querySelector('.contract').innerHTML = owner==='clover'
+      ? (p ? `NOW ${P[k].fmt(S.vent[k])} → OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN` : `± = OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN`)
+      : (p ? `NOW ${P[k].fmt(S.vent[k])} → SENDS TO VENT` : 'USER SETTING · APPLY SENDS TO VENT');
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
@@ -893,6 +911,8 @@ function renderTop(){
   lb.classList.toggle('armed', mArmed);
   lb.querySelector('.aword').textContent = mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
   lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START FIRST' : 'TAP · THEN CONFIRM';
+  const cr=$('#cfg-ovr'), cv = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; cr.classList.toggle('dirty', S.cfgEdit!=null && S.cfgEdit!==S.cfg.overrideMin);
+  cr.querySelector('.cfg-val').textContent = cv + ' min'; cr.querySelector('.cfg-dec').disabled = cv<=1; cr.querySelector('.cfg-inc').disabled = cv>=30;
   $('#s-ie').textContent = IE[S.ie];
   const ie=$('#ie-tile'); ie.classList.toggle('editing', !!S.ieEdit);
   if (S.ieEdit){ $('#ie-val').textContent = IE[S.ieEdit.idx]; ie.querySelector('.ie-dec').disabled = S.ieEdit.idx<=0; ie.querySelector('.ie-inc').disabled = S.ieEdit.idx>=IE.length-1; }
@@ -1036,10 +1056,13 @@ document.querySelectorAll('.vital .win').forEach(w=>w.addEventListener('click',e
 $('#o2btn').addEventListener('click',()=>{ if (S.vent.fio2 >= 1.0 - 1e-9) return; S.o2arm = (S.o2arm!=null) ? null : performance.now(); render(); });
 $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2arm=null; S.pending.fio2=null;
   if (!S.vent_link.connected){ addLog('USER','Emergency O₂ refused — ventilator link lost','FiO₂ 100% confirmed but no link to the ventilator; nothing sent.'); render(); return; }
-  applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${OVERRIDE_HOLD/60} min unless released.`);
+  applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${S.cfg.overrideMin} min unless released.`);
   evalAlerts(); render(); });
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); }));
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); if (b.dataset.close==='adv-ovl') S.cfgEdit=null; render(); }));
 $('#dispbtn').addEventListener('click',()=>{ $('#disp-ovl').classList.add('open'); addLog('USER','Opened advanced display',''); });
+$('#cfg-ovr').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
+  if (b.classList.contains('cfg-apply')){ const from=S.cfg.overrideMin; S.cfg.overrideMin=S.cfgEdit; S.cfgEdit=null; addLog('USER', `SETUP: override lockout ${from} → ${S.cfg.overrideMin} min`, 'Applies to overrides started from now on.'); render(); return; }
+  const cur = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; S.cfgEdit = clamp(cur + (b.classList.contains('cfg-inc')?1:-1), 1, 30); render(); });
 $('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened SETUP',''); });
 $('#logbtn').addEventListener('click',()=>{ $('#log-ovl').classList.add('open'); renderLog(); });
 $('#log-filter').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.logFilter=b.dataset.f; $('#log-filter').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); renderLog(); });

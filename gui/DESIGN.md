@@ -53,11 +53,12 @@ still.
    only the operator can (MANUAL, an active override with its countdown, or STOPPED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
-   **The ± contract is stated before it is accepted:** on a CLOVER-controlled setting, a
-   pending adjustment shows "TAKES RR FROM CLOVER · 5 MIN", the band previews
-   "CLOVER IN CONTROL → USER?", and the confirm button reads OVERRIDE, not APPLY. On a
-   user-controlled setting (MANUAL, existing override, STOPPED) it reads "SENDS TO VENT"
-   with an APPLY button. So ± never silently starts an override.
+   **The ± contract is stated before it is accepted:** every control tile has a permanent
+   contract line above its ± buttons. CLOVER-controlled: "± = OVERRIDE FOR 5 MIN", becoming
+   "NOW 14 → OVERRIDE FOR 5 MIN" while pending, with the band previewing "CLOVER IN
+   CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
+   existing override, STOPPED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
+   The minutes are read live from the override lockout set in SETUP (1–30 min, default 5).
 8. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are
    explicit pixels; nothing is "the remainder".
@@ -126,8 +127,8 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
    last command with acknowledgement and time, battery with runtime, O₂ supply. Hosts the
    demo-only SIM button. Goes critical red and pulses on link loss.
 1b. **SETUP** button (beside the summary row): opens the provider-level panel. Currently
-   a placeholder listing candidate contents (controller limits, alarm limits, override
-   lockout, decision cycle, ventilator setup, custom layout).
+   the override lockout stepper (real) plus placeholders for controller limits, alarm
+   limits, emergency O₂ exemption, decision cycle, ventilator setup, custom layout.
 2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label
    · rotating loop icon · FULL AUTO / PARTIAL OVERRIDE / MANUAL / STOPPED · a fixed strip of
    four pips (FiO₂ PEEP VT RR, same order as the control tiles) each green or amber to
@@ -172,8 +173,8 @@ is applied to the arrows only; the slash never rotates.
 - **UPDATE** button forces a decision immediately.
 - **MANUAL**: controller computes and logs advisories, posts SUGGESTS chips, applies nothing.
 - **STOPPED**: controller does nothing; ventilator holds current settings.
-- **User override**: locks that parameter against the controller for 5 min, shown as a
-  countdown; RETURN TO CLOVER cancels it early and forces an immediate decision.
+- **User override**: locks that parameter against the controller for the SETUP lockout
+  (default 5 min), shown as a countdown; RETURN TO CLOVER cancels it early and forces an immediate decision.
 - **Emergency O₂**: FiO₂ → 100% from the SpO₂ tile, arm + CONFIRM, works in any mode,
   counts as an override.
 - **Ventilator link lost**: critical alert, controller holds and logs, all adjustment
