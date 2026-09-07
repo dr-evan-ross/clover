@@ -331,7 +331,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .ctl.own-none .owner{background:var(--g4);color:var(--ink2)}
 .ctl.own-none .num,.ctl.own-none .name,.ctl.own-none .unit{opacity:.5}
 .ctl.own-none .btns button{opacity:.25}
-.ctl.pending{border-color:var(--ink)}
+.ctl.pending{border-color:var(--warn)}
 .ctl .head{display:flex;justify-content:space-between;align-items:baseline}
 .ctl .name{font-family:var(--f-disp);font-weight:600;font-size:24px;letter-spacing:.06em}
 .ctl .name sub{font-size:14px;position:relative;top:3px}
@@ -340,7 +340,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 .ctl .unit{font-size:13px;letter-spacing:.1em;color:var(--ink2);text-transform:uppercase}
 .ctl .num{font-family:var(--f-disp);font-weight:700;font-size:58px;line-height:1;text-align:center;align-self:center;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.ctl.pending .num{color:var(--warn)}
+.ctl .num .prop{display:block;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--warn);height:16px;line-height:16px;margin-top:2px;text-align:center}
 .ctl .contract{font-family:var(--f-disp);font-weight:600;font-size:11px;letter-spacing:.1em;color:var(--ink2);text-align:center;white-space:nowrap;line-height:16px}
 .ctl.pending .contract,.ctl.overridden .contract{color:var(--warn)}
 .ctl .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -847,7 +847,7 @@ function buildControls(){
   ORDER.forEach(k => {
     const el=document.createElement('div'); el.className='ctl'; el.id='c-'+k;
     el.innerHTML = `<div class="owner"><span class="who"></span></div><div class="head"><span class="name">${P[k].name}</span><span class="unit">${P[k].unit}</span></div>
-      <div class="num"><span class="v"></span></div>
+      <div class="num"><span class="v"></span><span class="prop"></span></div>
       <div class="contract"></div>
       <div class="btns"><button class="dec" aria-label="Decrease ${P[k].plain}">−</button><button class="inc" aria-label="Increase ${P[k].plain}">+</button></div>
       <div class="aux"><button class="cancel">CANCEL</button><button class="apply">APPLY</button><button class="take"></button><button class="release"></button></div>
@@ -871,12 +871,13 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=(S.running && S.mode==='AUTO') ? overrideLeft(k) : 0, sg=S.suggest[k];
     const owner = !S.running ? 'vent' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : owner==='vent' ? 'own-none' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
-    el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
-    el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE DURATION ${cellsHTML(mmss(OVR()))}`
-      : owner==='override' ? `AUTO RESUMES IN ${cellsHTML(mmss(ov))}`
+    el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
+    el.querySelector('.v').textContent = P[k].fmt(S.vent[k]);
+    el.querySelector('.prop').textContent = p ? `PROPOSED ${fmtP(k,p.v)}` : '\u00a0';
+    el.querySelector('.contract').innerHTML = owner==='clover' ? (p ? `OVERRIDE ${esc(fmtP(k,p.v))} FOR ${cellsHTML(mmss(OVR()))}` : `OVERRIDE DURATION ${cellsHTML(mmss(OVR()))}`)
+      : owner==='override' ? (p ? `SEND ${esc(fmtP(k,p.v))} TO VENT` : `AUTO RESUMES IN ${cellsHTML(mmss(ov))}`)
       : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
-      : 'USER SETTING';
+      : (p ? `SEND ${esc(fmtP(k,p.v))} TO VENT` : 'USER SETTING');
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected && S.running;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
