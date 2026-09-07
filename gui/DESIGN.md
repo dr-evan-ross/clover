@@ -54,7 +54,7 @@ still.
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
    **The ± contract is stated before it is accepted:** every control tile has a permanent
-   contract line above its ± buttons. CLOVER-controlled: "± = OVERRIDE FOR 5 MIN", becoming
+   contract line above its ± buttons. CLOVER-controlled: "OVERRIDE FOR 5 MIN", becoming
    "NOW 14 → OVERRIDE FOR 5 MIN" while pending, with the band previewing "CLOVER IN
    CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
    existing override, STOPPED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
