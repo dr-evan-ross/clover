@@ -868,7 +868,7 @@ function buildControls(){
 
 function renderControls(){
   ORDER.forEach(k => {
-    const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=S.running ? overrideLeft(k) : 0, sg=S.suggest[k];
+    const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=(S.running && S.mode==='AUTO') ? overrideLeft(k) : 0, sg=S.suggest[k];
     const owner = !S.running ? 'vent' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : owner==='vent' ? 'own-none' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
     el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
@@ -1046,6 +1046,7 @@ $('#loopbox').addEventListener('click', ()=>{
   S.modeArm=null;
   S.mode = S.mode==='AUTO'?'MANUAL':'AUTO'; S.modeSince = S.t;
   ORDER.forEach(k=>S.suggest[k]=null);
+  if (S.mode==='MANUAL'){ const held = ORDER.filter(k=>overrideLeft(k)>0); ORDER.forEach(k=>S.override[k]=null); if (held.length) addLog('SYS','Overrides cleared', `${held.map(k=>P[k].plain).join(', ')} override${held.length>1?'s':''} ended: in MANUAL the operator holds every setting.`); }
   addLog('USER',`Mode → ${S.mode==='AUTO'?'AUTOMATIC':'MANUAL'}`, S.mode==='AUTO'?'Controller will apply its decisions.':'Controller will compute and log recommendations but not apply them.');
   S.lastDecision=S.t-DECISION_PERIOD; evalAlerts(); render();
 });

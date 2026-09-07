@@ -177,6 +177,8 @@ is applied to the arrows only; the slash never rotates.
   signal triggers an immediate decision and restarts the cycle. Edge-triggered only.
 - **UPDATE** button forces a decision immediately.
 - **MANUAL**: controller computes and logs advisories, posts SUGGESTS chips, applies nothing.
+  Switching to MANUAL ends any running overrides (logged); DISENGAGE does the same. An
+  override exists only while CLOVER is in charge.
 - **DISENGAGED**: CLOVER is off the vent. No commands, no advisories, no adjustments from
   this screen: every control tile greys out with a VENT PANEL IN CONTROL band and the mode
   tile reads DISENGAGED with grey pips. Emergency O₂ and I:E are refused. The ventilator
