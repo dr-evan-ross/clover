@@ -868,7 +868,7 @@ function buildControls(){
 
 function renderControls(){
   ORDER.forEach(k => {
-    const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
+    const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=S.running ? overrideLeft(k) : 0, sg=S.suggest[k];
     const owner = !S.running ? 'vent' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : owner==='vent' ? 'own-none' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
     el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
@@ -1035,7 +1035,8 @@ $('#gostop').addEventListener('click', ()=>{
   const settings = ['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ');
   if (S.running){ S.mode='AUTO'; S.modeSince=S.t; ORDER.forEach(k=>{ S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; }); S.lastDecision=S.t-DECISION_PERIOD;
     addLog('USER','ENGAGE — CLOVER in control', `Settings read back from the ventilator: ${settings}. FULL AUTO; first decision immediately.`); }
-  else { ORDER.forEach(k=>{ S.pending[k]=null; }); S.o2arm=null; S.modeArm=null;
+  else { const held = ORDER.filter(k=>overrideLeft(k)>0); ORDER.forEach(k=>{ S.pending[k]=null; S.override[k]=null; S.suggest[k]=null; }); S.o2arm=null; S.modeArm=null;
+    if (held.length) addLog('SYS','Overrides cleared', `${held.map(k=>P[k].plain).join(', ')} override${held.length>1?'s':''} ended because CLOVER is disengaged.`);
     addLog('USER','DISENGAGE — CLOVER released the ventilator', `No further commands or advisories from CLOVER. Ventilator continues on its own front-panel controls at: ${settings}.`); }
   evalAlerts(); render();
 });
