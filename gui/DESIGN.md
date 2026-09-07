@@ -48,14 +48,15 @@ still.
    action, every alert onset and clearance, and every armed-but-not-confirmed tap.
 7. **Who is in charge of each setting is always explicit.** Every control tile carries an
    ownership band across its top and a matching colour scheme: green "CLOVER IN CONTROL"
-   when the controller may change it (AUTO, running, no override); amber "USER IN CONTROL" (with
-   the override countdown appended when one is running) when
+   when the controller may change it (AUTO, running, no override); amber "USER IN CONTROL" when
    only the operator can (MANUAL, an active override with its countdown, or STOPPED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
    **The ± contract is stated before it is accepted:** every control tile has a permanent
-   contract line above its ± buttons. CLOVER-controlled: "OVERRIDE FOR 5 MIN", turning
-   amber while an adjustment is pending, with the band previewing "CLOVER IN
+   contract line above its ± buttons. CLOVER-controlled: "OVERRIDE FOR 5:00" (the SETUP lockout as m:ss),
+   turning amber while an adjustment is pending and counting down ("OVERRIDE FOR 4:32")
+   once an override is running, which is the only place the countdown appears; the band
+   previews "CLOVER IN
    CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
    existing override, STOPPED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
    The minutes are read live from the override lockout set in SETUP (1–30 min, default 5).

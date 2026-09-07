@@ -337,7 +337,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .ctl .num{font-family:var(--f-disp);font-weight:700;font-size:58px;line-height:1;text-align:center;align-self:center;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 .ctl.pending .num{color:var(--warn)}
 .ctl .contract{font-family:var(--f-disp);font-weight:600;font-size:11px;letter-spacing:.1em;color:var(--ink2);text-align:center;white-space:nowrap;line-height:16px}
-.ctl.pending .contract{color:var(--warn)}
+.ctl.pending .contract,.ctl.overridden .contract{color:var(--warn)}
 .ctl .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ctl .btns button{height:48px;border:1px solid var(--line2);background:rgba(255,255,255,.05);font-family:var(--f-disp);font-size:34px;font-weight:600;line-height:1}
 .ctl .btns button:active{background:var(--g3)}
@@ -866,10 +866,10 @@ function renderControls(){
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
     const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
+    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? 'USER IN CONTROL' : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
-    el.querySelector('.contract').innerHTML = owner==='clover'
-      ? `OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN`
+    el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE FOR ${cellsHTML(mmss(OVR()))}`
+      : owner==='override' ? `OVERRIDE FOR ${cellsHTML(mmss(ov))}`
       : 'USER SETTING · APPLY SENDS TO VENT';
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected;
@@ -877,7 +877,7 @@ function renderControls(){
     el.querySelector('.inc').disabled = !linked || (p?p.v:S.vent[k]) >= P[k].max - 1e-9;
     el.querySelector('.apply').disabled = !linked;
     if (sg!=null) el.querySelector('.take').textContent = `SUGGESTS ${P[k].fmt(sg)} · TAP TO LOAD`;
-    if (ov>0) el.querySelector('.release').innerHTML = `RETURN TO CLOVER · ${cellsHTML(mmss(ov))}`;
+    if (ov>0) el.querySelector('.release').textContent = 'RETURN TO CLOVER';
     el.querySelector('.t').textContent = sb.t ? `set ${dhm(S.startT+sb.t*1000)}` : 'initial setting';
   });
 }
