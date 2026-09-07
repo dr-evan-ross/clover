@@ -104,12 +104,13 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox .lab,#loopbox .lab2{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.8}
 #loopbox .word{font-family:var(--f-disp);font-weight:700;font-size:34px;letter-spacing:.08em;line-height:1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
 #loopbox .word.long{font-size:21px;letter-spacing:.06em}
+#loopbox .word.mid{font-size:27px;letter-spacing:.06em}
 #loopbox .pips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
 #loopbox .pip{height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.06em}
 #loopbox .pip.clover{background:#245a1a;color:#d4f2c0}
 #loopbox .pip.user{background:#7a5f14;color:#fff0c2}
 #loopbox .pip.none{background:var(--g4);color:var(--ink3)}
-#loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:19px;letter-spacing:.14em;line-height:30px;height:30px;display:flex;align-items:center;justify-content:center;white-space:nowrap;width:100%}
+#loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:17px;letter-spacing:.12em;line-height:30px;height:30px;display:flex;align-items:center;justify-content:center;white-space:nowrap;width:100%}
 #loopbox .icon-row{height:72px;display:flex;align-items:center;justify-content:center}
 #loopbox .loopicon{width:66px;height:66px;flex:none;overflow:visible}
 #loopbox .arrows{transform-box:view-box;transform-origin:50% 50%;animation:spin 30s steps(30,end) infinite;animation-play-state:paused}
@@ -911,10 +912,11 @@ function renderTop(){
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : partial ? 'is-partial' : 'is-running';
   lb.querySelector('.wt').textContent = !S.running ? 'DISENGAGED' : manual ? 'MANUAL' : partial ? 'PARTIAL OVERRIDE' : 'FULL AUTO';
   lb.querySelector('.word').classList.toggle('long', partial);
+  lb.querySelector('.word').classList.toggle('mid', !S.running);
   lb.querySelectorAll('.pip').forEach(pp => { const k=pp.dataset.k; const mine = S.running && S.mode==='AUTO' && overrideLeft(k)<=0; pp.className = 'pip ' + (!S.running ? 'none' : mine ? 'clover' : 'user'); });
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.classList.toggle('armed', mArmed);
-  lb.querySelector('.aword').textContent = !S.running ? 'ENGAGE CLOVER TO RESUME' : mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
+  lb.querySelector('.aword').textContent = !S.running ? 'ENGAGE TO RESUME' : mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
   lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? '' : 'TAP · THEN CONFIRM';
   const cr=$('#cfg-ovr'), cv = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; cr.classList.toggle('dirty', S.cfgEdit!=null && S.cfgEdit!==S.cfg.overrideMin);
   cr.querySelector('.cfg-val').textContent = cv + ' min'; cr.querySelector('.cfg-dec').disabled = cv<=1; cr.querySelector('.cfg-inc').disabled = cv>=30;
