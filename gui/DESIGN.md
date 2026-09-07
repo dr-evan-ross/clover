@@ -58,7 +58,7 @@ still.
    once an override is running, which is the only place the countdown appears; the band
    previews "CLOVER IN
    CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
-   existing override, DISENGAGED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
+   existing override, DISENGAGED): "USER SETTING" with an APPLY button.
    The minutes are read live from the override lockout set in SETUP (1–30 min, default 5).
 8. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are

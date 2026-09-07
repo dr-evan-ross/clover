@@ -876,7 +876,7 @@ function renderControls(){
     el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE FOR ${cellsHTML(mmss(OVR()))}`
       : owner==='override' ? `OVERRIDE FOR ${cellsHTML(mmss(ov))}`
       : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
-      : 'USER SETTING · APPLY SENDS TO VENT';
+      : 'USER SETTING';
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected && S.running;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
