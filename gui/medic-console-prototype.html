@@ -121,6 +121,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox .since{font-size:12px;letter-spacing:.08em;opacity:.75}
 #loopbox .asub{font-size:13px;letter-spacing:.03em;line-height:1.4;opacity:.85;height:40px;overflow:hidden}
 #loopbox .hint{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;opacity:.9}
+#loopbox.is-halted .hint{font-size:16px;letter-spacing:0;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 #loopbox.is-running{background:#13200f;border-color:var(--go);color:#9bd67a}
 #loopbox.is-running .arrows{animation-play-state:running}
 #loopbox.is-partial{background:#13200f;border-color:var(--warn);color:#f0c95c}
@@ -918,7 +920,7 @@ function renderTop(){
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.classList.toggle('armed', mArmed);
   lb.querySelector('.aword').textContent = !S.running ? 'ENGAGE TO RESUME' : mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
-  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? '' : 'TAP · THEN CONFIRM';
+  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? '▼' : 'TAP · THEN CONFIRM';
   const cr=$('#cfg-ovr'), cv = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; cr.classList.toggle('dirty', S.cfgEdit!=null && S.cfgEdit!==S.cfg.overrideMin);
   cr.querySelector('.cfg-val').textContent = cv + ' min'; cr.querySelector('.cfg-dec').disabled = cv<=1; cr.querySelector('.cfg-inc').disabled = cv>=30;
   $('#s-ie').textContent = IE[S.ie];
