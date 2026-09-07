@@ -146,13 +146,13 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 @keyframes arm-pulse{0%,100%{filter:brightness(1);border-color:rgba(255,255,255,.35);box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{filter:brightness(1.35);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.18)}}
 
 /* left lower: patient card */
-#ptcard{border:2px solid var(--line);background:var(--g1);padding:12px 16px 10px;display:flex;flex-direction:column;gap:7px;min-height:0;overflow:hidden}
+#ptcard{border:2px solid var(--line);background:var(--g1);padding:12px 16px 10px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden}
 #ptcard .lab{font-size:12px;letter-spacing:.16em;color:var(--ink2);text-transform:uppercase}
 #ptcard .conn{display:flex;align-items:center;gap:12px;height:30px}
 #ptcard .dot{width:16px;height:16px;border-radius:50%;flex:none}
 #ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:26px;letter-spacing:.1em;line-height:1}
 #ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:14px;margin-top:2px}
+#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:14px;margin-top:0;line-height:1.15}
 #ptcard .kv dt{color:var(--ink2);margin:0;white-space:nowrap}
 #ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
 #ptcard.is-conn{border-color:var(--go)}
@@ -282,7 +282,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .alert.sev-crit .sev{background:var(--crit);color:#fff}
 .alert.sev-warn .sev{background:var(--warn);color:var(--warn-ink)}
 .alert.sev-info .sev{background:var(--info);color:#06121b}
-.alert .since{font-family:var(--f-mono);font-size:13px;color:var(--ink2);min-width:64px;text-align:right}
+.alert .since{font-family:var(--f-mono);font-size:12px;color:var(--ink2);min-width:122px;text-align:right;white-space:nowrap}
 .alert .ackbtn{height:36px;min-width:78px;padding:0 12px;border:1px solid var(--line2);font-family:var(--f-disp);font-weight:600;letter-spacing:.14em;font-size:13px}
 .alert.ack .ackbtn{color:var(--ink3);border-color:var(--line)}
 
@@ -555,6 +555,7 @@ const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const pad = n => String(n).padStart(2,'0');
 let TZ = 'local';
 const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const dhms = ms => dhm(ms) + ':' + pad(TZ==='utc' ? new Date(ms).getUTCSeconds() : new Date(ms).getSeconds());
 const dhm = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCDate())} ${MON[d.getUTCMonth()]} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` : `${pad(d.getDate())} ${MON[d.getMonth()]} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const hms = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
 const hm  = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
@@ -806,7 +807,7 @@ function renderAlerts(){
     li.innerHTML = `<span class="stripe"></span><span class="txt"><span class="sev"></span><span class="m"></span></span><span class="since"></span><button class="ackbtn"></button>`;
     li.querySelector('.sev').textContent = a.sev==='crit'?'CRITICAL':a.sev.toUpperCase();
     li.querySelector('.m').innerHTML = cellsHTML(a.txt);
-    li.querySelector('.since').textContent = hms(S.startT + a.since*1000);
+    li.querySelector('.since').textContent = dhms(S.startT + a.since*1000);
     const b=li.querySelector('.ackbtn'); b.textContent = a.ack?'ACK\u2019D':'ACK';
     b.addEventListener('click', () => { if(!a.ack){ a.ack=true; addLog('USER',`Acknowledged: ${a.txt}`,''); render(); } });
     list.appendChild(li);
@@ -850,7 +851,7 @@ function renderControls(){
     el.querySelector('.apply').disabled = !linked;
     if (sg!=null) el.querySelector('.take').textContent = `SUGGESTS ${P[k].fmt(sg)} · TAP TO LOAD`;
     if (ov>0) el.querySelector('.release').innerHTML = `RETURN TO CLOVER · ${cellsHTML(mmss(ov))}`;
-    el.querySelector('.t').textContent = sb.t ? `set ${hm(S.startT+sb.t*1000)}` : 'initial setting';
+    el.querySelector('.t').textContent = sb.t ? `set ${dhm(S.startT+sb.t*1000)}` : 'initial setting';
   });
 }
 
@@ -872,7 +873,7 @@ function renderTop(){
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
   $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
   $('#vent-since').textContent = dhm(S.startT + (!S.running ? S.runSince : Math.max(S.runSince, S.modeSince))*1000);
-  $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓ ${hm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
+  $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓<br>${dhm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
   lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO';
@@ -939,7 +940,7 @@ function applyHover(k){
   const c=xh.querySelector('circle'); if(best[k]!=null){ c.style.display=''; c.setAttribute('cx',xx); c.setAttribute('cy',G.y(best[k])); } else c.style.display='none';
   tip.innerHTML='';
   const v=document.createElement('div'); v.className='v'; v.textContent = best[k]==null?'no signal':Math.round(best[k])+(k==='spo2'?' %':' mmHg'); tip.appendChild(v);
-  const tt=document.createElement('div'); tt.className='t'; tt.textContent=hms(S.startT+best.t*1000); tip.appendChild(tt);
+  const tt=document.createElement('div'); tt.className='t'; tt.textContent=dhms(S.startT+best.t*1000); tip.appendChild(tt);
   S.log.filter(l=>Math.abs(l.t-best.t)<=Math.max(10,S.trend[k].win) && ((l.src==='CTRL'&&l.title!=='No change')||(l.src==='USER'&&l.title.includes('→')))).slice(-2).forEach(l=>{
     const e=document.createElement('div'); e.className='e'; const b=document.createElement('b'); b.textContent=l.src==='CTRL'?'CLOVER':'USER'; e.appendChild(b); e.appendChild(document.createTextNode(l.title)); tip.appendChild(e); });
   tip.style.display='block';
@@ -968,7 +969,7 @@ function renderLog(){
   $('#log-count').textContent = `${rows.length} of ${S.log.length} entries`;
   const names={CTRL:'CONTROLLER',USER:'USER',ALERT:'ALERT',SYS:'SYSTEM'};
   rows.forEach(l=>{ const tr=document.createElement('tr'); tr.className='src-'+l.src;
-    const c1=document.createElement('td'); c1.className='t'; c1.textContent=hms(S.startT+l.t*1000);
+    const c1=document.createElement('td'); c1.className='t'; c1.textContent=dhms(S.startT+l.t*1000);
     const c2=document.createElement('td'); const ch=document.createElement('span'); ch.className='chip '+(l.src==='CTRL'?'ctrl':l.src==='USER'?'user':''); ch.textContent=names[l.src]; c2.appendChild(ch);
     const c3=document.createElement('td'); c3.className='ev'; c3.textContent=l.title;
     const c4=document.createElement('td'); c4.className='d'; c4.textContent=l.detail;
