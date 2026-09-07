@@ -108,6 +108,7 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox .pip{height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.06em}
 #loopbox .pip.clover{background:#245a1a;color:#d4f2c0}
 #loopbox .pip.user{background:#7a5f14;color:#fff0c2}
+#loopbox .pip.none{background:var(--g4);color:var(--ink3)}
 #loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:19px;letter-spacing:.14em;line-height:30px;height:30px;display:flex;align-items:center;justify-content:center;white-space:nowrap;width:100%}
 #loopbox .icon-row{height:72px;display:flex;align-items:center;justify-content:center}
 #loopbox .loopicon{width:66px;height:66px;flex:none;overflow:visible}
@@ -141,16 +142,15 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 
 /* GO/STOP */
 #gostop{border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-#gostop .pre{font-family:var(--f-disp);font-weight:700;font-size:18px;letter-spacing:.24em;line-height:1;height:18px}
-#gostop.is-stopped .pre{visibility:hidden}
-#gostop .word{font-family:var(--f-disp);font-weight:700;font-size:56px;letter-spacing:.08em;line-height:1}
-#gostop .sub{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-align:center;line-height:18px;padding:0 14px;height:18px;overflow:hidden}
+#gostop .pre{font-family:var(--f-disp);font-weight:700;font-size:14px;letter-spacing:.28em;line-height:1;height:14px;opacity:.85}
+#gostop .word{font-family:var(--f-disp);font-weight:700;font-size:38px;letter-spacing:.08em;line-height:1;white-space:nowrap}
+#gostop .sub{font-family:var(--f-disp);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-align:center;line-height:15px;padding:0 12px;height:30px;overflow:hidden;opacity:.9}
 #gostop.is-running{background:linear-gradient(180deg,#a03a28,#7a2818);border-color:#d6614a;color:#fbe9e2}
 #gostop.is-running:active{background:#b7402c}
 #gostop.is-stopped{background:linear-gradient(180deg,#5b9838,#3c6c25);border-color:#8fcf6a;color:#eefae3}
 #gostop.is-stopped:active{background:var(--go)}
 #gostop.armed{animation:arm-pulse 1.2s ease-in-out infinite}
-#gostop.armed .word{font-size:44px}
+#gostop.armed .word{font-size:32px}
 @keyframes arm-pulse{0%,100%{filter:brightness(1);border-color:rgba(255,255,255,.35);box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{filter:brightness(1.35);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.18)}}
 
 /* left lower: patient card */
@@ -326,6 +326,10 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 .ctl.own-clover .owner{background:#245a1a;color:#d4f2c0}
 .ctl.own-user{border-color:#a5842a;background:#1a1508}
 .ctl.own-user .owner{background:#7a5f14;color:#fff0c2}
+.ctl.own-none{border-color:var(--line2);background:var(--g1)}
+.ctl.own-none .owner{background:var(--g4);color:var(--ink2)}
+.ctl.own-none .num,.ctl.own-none .name,.ctl.own-none .unit{opacity:.5}
+.ctl.own-none .btns button{opacity:.25}
 .ctl.pending{border-color:var(--ink)}
 .ctl .head{display:flex;justify-content:space-between;align-items:baseline}
 .ctl .name{font-family:var(--f-disp);font-weight:600;font-size:24px;letter-spacing:.06em}
@@ -451,7 +455,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">FULL AUTO</span></span><span class="pips"><span class="pip" data-k="fio2">FiO₂</span><span class="pip" data-k="peep">PEEP</span><span class="pip" data-k="vt">VT</span><span class="pip" data-k="rr">RR</span></span></span>
         <span class="zone switch"><span class="aword">SWITCH TO MANUAL</span><span class="hint"></span></span>
       </button>
-      <button id="gostop" class="is-running"><span class="pre">EMERGENCY</span><span class="word">STOP</span><span class="sub"></span></button>
+      <button id="gostop" class="is-running"><span class="pre">CLOVER</span><span class="word">DISENGAGE</span><span class="sub"></span></button>
     </aside>
 
         <main id="right">
@@ -699,7 +703,7 @@ function applyChange(k, to, src, detail){
   S.lastCmd = { what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t };
   if (src === 'USER'){
     S.override[k] = { until: S.t + OVR() };
-    addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${S.cfg.overrideMin} min unless released.` : `Manual adjustment by operator (${S.running ? 'MANUAL mode' : 'loop stopped'}); sent to the ventilator.`));
+    addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${S.cfg.overrideMin} min unless released.` : 'Manual adjustment by operator in MANUAL mode; sent to the ventilator.'));
   } else {
     addLog('CTRL', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail);
   }
@@ -738,7 +742,7 @@ function evalAlerts(){
   else if (et < 30) want.push({ id:'etco2', sev:'warn', txt:`etCO₂ ${et.toFixed(0)} mmHg — low` });
   if (v.fio2 >= 1.0) want.push({ id:'fio2max', sev:'warn', txt:'FiO₂ at 100% — no further oxygen reserve' });
   if (v.peep >= 15) want.push({ id:'peepmax', sev:'warn', txt:`PEEP ${v.peep} — at controller ceiling` });
-  if (!S.running) want.push({ id:'halt', sev:'info', txt:'Controller stopped — ventilator holding current settings' });
+  if (!S.running) want.push({ id:'diseng', sev:'warn', txt:'CLOVER disengaged — ventilator on its own controls' });
   else if (S.mode === 'MANUAL') want.push({ id:'manual', sev:'info', txt:'MANUAL mode — controller advising only' });
   ORDER.forEach(k => { if (overrideLeft(k) > 0) want.push({ id:'ovr-'+k, sev:'info', txt:`${P[k].plain} under user override — ${mmss(overrideLeft(k))} left` }); });
 
@@ -855,7 +859,7 @@ function buildControls(){
     el.querySelector('.take').addEventListener('click',()=>{ const s=S.suggest[k]; if(s==null) return; S.pending[k]={v:s,at:S.t}; render(); });
     el.querySelector('.release').addEventListener('click',()=>{ const left=overrideLeft(k); if(left<=0) return; S.override[k]=null;
       const now = S.running && S.mode==='AUTO'; if (now) S.lastDecision = S.t - DECISION_PERIOD;
-      addLog('USER', `${P[k].plain} returned to CLOVER`, `Operator cancelled the override lockout with ${mmss(left)} remaining.` + (now ? ' Controller re-evaluates immediately.' : ` Controller is ${S.running?'in MANUAL mode':'stopped'}; it will resume adjusting ${P[k].plain} when active.`));
+      addLog('USER', `${P[k].plain} returned to CLOVER`, `Operator cancelled the override lockout with ${mmss(left)} remaining.` + (now ? ' Controller re-evaluates immediately.' : ` Controller is ${S.running?'in MANUAL mode':'disengaged'}; it will resume adjusting ${P[k].plain} when active.`));
       evalAlerts(); render(); });
     c.appendChild(el);
   });
@@ -864,15 +868,16 @@ function buildControls(){
 function renderControls(){
   ORDER.forEach(k => {
     const el=$('#c-'+k), p=S.pending[k], sb=S.setBy[k], ov=overrideLeft(k), sg=S.suggest[k];
-    const owner = !S.running ? 'stopped' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
-    el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
-    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? 'USER IN CONTROL' : 'USER IN CONTROL';
+    const owner = !S.running ? 'vent' : S.mode==='MANUAL' ? 'user' : ov>0 ? 'override' : 'clover';
+    el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : owner==='vent' ? 'own-none' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
+    el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
     el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE FOR ${cellsHTML(mmss(OVR()))}`
       : owner==='override' ? `OVERRIDE FOR ${cellsHTML(mmss(ov))}`
+      : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
       : 'USER SETTING · APPLY SENDS TO VENT';
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
-    const linked = S.vent_link.connected;
+    const linked = S.vent_link.connected && S.running;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
     el.querySelector('.inc').disabled = !linked || (p?p.v:S.vent[k]) >= P[k].max - 1e-9;
     el.querySelector('.apply').disabled = !linked;
@@ -898,19 +903,19 @@ function renderTop(){
   const pc=$('#ptcard'), L=S.vent_link;
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
-  $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
+  $('#vent-meta').innerHTML = L.connected ? (S.running ? 'USB serial · 1 Hz' : 'monitor only') : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
   $('#vent-since').textContent = dhm(S.startT + (!S.running ? S.runSince : Math.max(S.runSince, S.modeSince))*1000);
   $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓<br>${dhm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   const held = ORDER.filter(k => overrideLeft(k) > 0), partial = S.running && S.mode==='AUTO' && held.length > 0;
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : partial ? 'is-partial' : 'is-running';
-  lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : partial ? 'PARTIAL OVERRIDE' : 'FULL AUTO';
+  lb.querySelector('.wt').textContent = !S.running ? 'DISENGAGED' : manual ? 'MANUAL' : partial ? 'PARTIAL OVERRIDE' : 'FULL AUTO';
   lb.querySelector('.word').classList.toggle('long', partial);
-  lb.querySelectorAll('.pip').forEach(pp => { const k=pp.dataset.k; const mine = S.running && S.mode==='AUTO' && overrideLeft(k)<=0; pp.className = 'pip ' + (mine ? 'clover' : 'user'); });
+  lb.querySelectorAll('.pip').forEach(pp => { const k=pp.dataset.k; const mine = S.running && S.mode==='AUTO' && overrideLeft(k)<=0; pp.className = 'pip ' + (!S.running ? 'none' : mine ? 'clover' : 'user'); });
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.classList.toggle('armed', mArmed);
-  lb.querySelector('.aword').textContent = mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
-  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? 'PRESS START FIRST' : 'TAP · THEN CONFIRM';
+  lb.querySelector('.aword').textContent = !S.running ? 'ENGAGE CLOVER TO RESUME' : mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
+  lb.querySelector('.hint').innerHTML = mArmed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(mLeft)}` : !S.running ? '' : 'TAP · THEN CONFIRM';
   const cr=$('#cfg-ovr'), cv = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; cr.classList.toggle('dirty', S.cfgEdit!=null && S.cfgEdit!==S.cfg.overrideMin);
   cr.querySelector('.cfg-val').textContent = cv + ' min'; cr.querySelector('.cfg-dec').disabled = cv<=1; cr.querySelector('.cfg-inc').disabled = cv>=30;
   $('#s-ie').textContent = IE[S.ie];
@@ -920,8 +925,8 @@ function renderTop(){
   const gs=$('#gostop');
   const armed = S.gsArm!=null, left = armed ? Math.ceil((5000 - (performance.now()-S.gsArm))/1000) : 0;
   gs.className = (S.running ? 'is-running' : 'is-stopped') + (armed ? ' armed' : '');
-  gs.querySelector('.word').textContent = armed ? (S.running ? 'STOP?' : 'START?') : (S.running ? 'STOP' : 'START');
-  gs.querySelector('.sub').innerHTML = armed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(left)}` : '';
+  gs.querySelector('.word').textContent = armed ? (S.running ? 'DISENGAGE?' : 'ENGAGE?') : (S.running ? 'DISENGAGE' : 'ENGAGE');
+  gs.querySelector('.sub').innerHTML = armed ? `TAP AGAIN TO CONFIRM · ${cellsHTML(left)}` : (S.running ? 'Releases the vent to its own controls.<br>Ventilation continues.' : 'Reads settings from the vent.<br>Resumes in MANUAL.');
 }
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cellsHTML = t => esc(String(t)).replace(/\d+(?::\d{2})?/g, m => '<span class="cd-cells">' + [...m].map(ch => `<span class="c${ch===':'?' sep':''}">${ch}</span>`).join('') + '</span>');
@@ -1010,7 +1015,7 @@ function renderLog(){
 
 /* ---------------- interactions ---------------- */
 $('#clockbtn').addEventListener('click', ()=>{ TZ = TZ==='utc' ? 'local' : 'utc'; addLog('SYS', `Clock display → ${TZ==='utc'?'ZULU (UTC)':'local time'}`, 'All displayed times, including this log, follow the clock setting.'); render(); if ($('#log-ovl').classList.contains('open')) renderLog(); });
-$('#ie-open').addEventListener('click', ()=>{ S.ieEdit = { idx:S.ie, at:S.t }; render(); });
+$('#ie-open').addEventListener('click', ()=>{ if (!S.running) return; S.ieEdit = { idx:S.ie, at:S.t }; render(); });
 $('#ie-tile').querySelector('.ie-edit').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b||!S.ieEdit) return;
   if (b.classList.contains('ie-cancel')){ S.ieEdit=null; }
   else if (b.classList.contains('ie-apply')){ const from=IE[S.ie]; S.ie=S.ieEdit.idx; S.ieEdit=null; if (IE[S.ie]!==from) addLog('USER', `I:E ${from} → ${IE[S.ie]}`, 'Operator changed the inspiratory:expiratory ratio. This setting is always user-controlled; CLOVER does not adjust it.'); }
@@ -1025,8 +1030,11 @@ $('#gostop').addEventListener('click', ()=>{
   if (S.gsArm==null){ S.gsArm = performance.now(); render(); return; }
   S.gsArm=null;
   S.running=!S.running; S.runSince=S.t;
-  if (S.running){ addLog('USER','START — closed loop resumed',`Controller resumed in ${S.mode} mode.`); S.lastDecision=S.t-DECISION_PERIOD; }
-  else addLog('USER','STOP — controller stopped','Operator stopped the closed loop. Ventilator continues at current settings: '+['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ')+'.');
+  const settings = ['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ');
+  if (S.running){ S.mode='MANUAL'; S.modeSince=S.t; ORDER.forEach(k=>{ S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; }); S.lastDecision=S.t-DECISION_PERIOD;
+    addLog('USER','ENGAGE — CLOVER re-engaged in MANUAL', `Settings read back from the ventilator: ${settings}. CLOVER advises only until the operator switches to AUTO.`); }
+  else { ORDER.forEach(k=>{ S.pending[k]=null; }); S.o2arm=null; S.modeArm=null;
+    addLog('USER','DISENGAGE — CLOVER released the ventilator', `No further commands or advisories from CLOVER. Ventilator continues on its own front-panel controls at: ${settings}.`); }
   evalAlerts(); render();
 });
 $('#loopbox').addEventListener('click', ()=>{
@@ -1056,6 +1064,7 @@ document.querySelectorAll('.vital .win').forEach(w=>w.addEventListener('click',e
 $('#o2btn').addEventListener('click',()=>{ if (S.vent.fio2 >= 1.0 - 1e-9) return; S.o2arm = (S.o2arm!=null) ? null : performance.now(); render(); });
 $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2arm=null; S.pending.fio2=null;
   if (!S.vent_link.connected){ addLog('USER','Emergency O₂ refused — ventilator link lost','FiO₂ 100% confirmed but no link to the ventilator; nothing sent.'); render(); return; }
+  if (!S.running){ addLog('USER','Emergency O₂ refused — CLOVER disengaged','Set FiO₂ on the ventilator itself.'); render(); return; }
   applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${S.cfg.overrideMin} min unless released.`);
   evalAlerts(); render(); });
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); if (b.dataset.close==='adv-ovl') S.cfgEdit=null; render(); }));
@@ -1156,7 +1165,7 @@ setInterval(()=>{
   const now=performance.now(); acc += (now-lastReal)/1000*S.speed; lastReal=now;
   let n=Math.min(600, Math.floor(acc)); acc-=n;
   while(n-- > 0) tick();
-  if (S.gsArm!=null && now - S.gsArm > 5000){ S.gsArm=null; addLog('SYS', (S.running?'STOP':'START')+' not confirmed', 'Button armed but not tapped again within 5 s; no change made.'); }
+  if (S.gsArm!=null && now - S.gsArm > 5000){ S.gsArm=null; addLog('SYS', (S.running?'DISENGAGE':'ENGAGE')+' not confirmed', 'Button armed but not tapped again within 5 s; no change made.'); }
   if (S.modeArm!=null && (now - S.modeArm > 5000 || !S.running)){ S.modeArm=null; if (S.running) addLog('SYS','Mode change not confirmed','Button armed but not tapped again within 5 s; mode unchanged.'); }
   if (S.o2arm!=null && now - S.o2arm > 8000){ S.o2arm=null; addLog('SYS','Emergency O₂ not confirmed','FiO₂ 100% was armed but not confirmed within 8 s; no change made.'); }
   render();
