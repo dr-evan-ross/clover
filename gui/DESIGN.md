@@ -61,7 +61,7 @@ still.
 
 | Use | Never |
 |---|---|
-| AUTO, MANUAL, STOPPED | AUTOMATIC, MANUAL MODE, HALTED |
+| FULL AUTO, PARTIAL OVERRIDE, MANUAL, STOPPED | AUTOMATIC, HYBRID, MANUAL MODE, HALTED |
 | START, EMERGENCY STOP | GO, HALT |
 | UPDATE (force a decision) | DECIDE NOW |
 | BRIGHT, DIM, RED (display) | DAY, LIGHT |
@@ -123,7 +123,12 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
 1b. **SETUP** button (beside the summary row): opens the provider-level panel. Currently
    a placeholder listing candidate contents (controller limits, alarm limits, override
    lockout, decision cycle, ventilator setup, custom layout).
-2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
+2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label
+   · rotating loop icon · FULL AUTO / PARTIAL OVERRIDE / MANUAL / STOPPED · a fixed strip of
+   four pips (FiO₂ PEEP VT RR, same order as the control tiles) each green or amber to
+   mirror that tile's ownership band, so the tile summarises ownership without inventing a
+   new colour. PARTIAL OVERRIDE = AUTO with at least one override: green ground, amber
+   border and word, icon still stepping because the loop is still running · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
    tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
    the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
    anywhere arms; second tap confirms; inert when STOPPED. State and control in one place.

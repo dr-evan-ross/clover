@@ -97,15 +97,20 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #right>*{min-height:0;overflow:hidden}
 
 /* closed-loop tile: status zone (beside vitals + summary) over switch zone (beside controls) */
-#loopbox{border:2px solid;display:grid;grid-template-rows:172px 1fr;text-align:center;padding:0}
+#loopbox{border:2px solid;display:grid;grid-template-rows:196px 1fr;text-align:center;padding:0}
 #loopbox .zone{display:grid;justify-items:center;align-content:center;padding:0 16px;min-height:0}
-#loopbox .zone.status{grid-template-rows:12px 88px 40px;gap:8px;align-content:end;padding-bottom:6px}
-#loopbox .zone.switch{grid-template-rows:30px 16px;gap:8px;align-content:start;padding-top:8px}
+#loopbox .zone.status{grid-template-rows:12px 72px 36px 26px;gap:8px;align-content:end;padding-bottom:4px}
+#loopbox .zone.switch{grid-template-rows:30px 16px;gap:6px;align-content:start;padding-top:4px}
 #loopbox .lab,#loopbox .lab2{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.8}
-#loopbox .word{font-family:var(--f-disp);font-weight:700;font-size:40px;letter-spacing:.1em;line-height:1;display:flex;align-items:center;justify-content:center}
+#loopbox .word{font-family:var(--f-disp);font-weight:700;font-size:34px;letter-spacing:.08em;line-height:1;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+#loopbox .word.long{font-size:21px;letter-spacing:.06em}
+#loopbox .pips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
+#loopbox .pip{height:26px;display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.06em}
+#loopbox .pip.clover{background:#245a1a;color:#d4f2c0}
+#loopbox .pip.user{background:#7a5f14;color:#fff0c2}
 #loopbox .aword{font-family:var(--f-disp);font-weight:700;font-size:19px;letter-spacing:.14em;line-height:30px;height:30px;display:flex;align-items:center;justify-content:center;white-space:nowrap;width:100%}
-#loopbox .icon-row{height:88px;display:flex;align-items:center;justify-content:center}
-#loopbox .loopicon{width:80px;height:80px;flex:none;overflow:visible}
+#loopbox .icon-row{height:72px;display:flex;align-items:center;justify-content:center}
+#loopbox .loopicon{width:66px;height:66px;flex:none;overflow:visible}
 #loopbox .arrows{transform-box:view-box;transform-origin:50% 50%;animation:spin 30s steps(30,end) infinite;animation-play-state:paused}
 #loopbox .slash,#loopbox .slash-halo{display:none;stroke-linecap:round}
 #loopbox .slash{stroke:currentColor;stroke-width:3.2}
@@ -116,6 +121,9 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #loopbox .hint{font-family:var(--f-disp);font-weight:600;font-size:13px;letter-spacing:.14em;opacity:.9}
 #loopbox.is-running{background:#13200f;border-color:var(--go);color:#9bd67a}
 #loopbox.is-running .arrows{animation-play-state:running}
+#loopbox.is-partial{background:#13200f;border-color:var(--warn);color:#f0c95c}
+#loopbox.is-partial .loopicon{color:#9bd67a}
+#loopbox.is-partial .arrows{animation-play-state:running}
 #loopbox.is-manual{background:#2a2110;border-color:var(--warn);color:#f0c95c}
 #loopbox.is-manual .slash,#loopbox.is-manual .slash-halo,#loopbox.is-halted .slash,#loopbox.is-halted .slash-halo{display:block}
 #loopbox.is-halted{background:#2c130e;border-color:var(--crit);color:#ff9b8c}
@@ -429,7 +437,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
       </section>
       <button id="advbtn"><span class="word">SETUP</span></button>
       <button id="loopbox" class="is-running">
-        <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">AUTO</span></span></span>
+        <span class="zone status"><span class="lab">Current mode</span><span class="icon-row"><svg class="loopicon" viewBox="0 0 28 28" aria-hidden="true"><g class="arrows"><path d="M23.50 14.00 A9.5 9.5 0 0 1 16.94 23.04" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="13.67,23.49 18.36,27.41 15.51,18.66" fill="currentColor"/><path d="M9.25 22.23 A9.5 9.5 0 0 1 4.71 12.02" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="5.94,8.97 0.21,11.07 9.21,12.98" fill="currentColor"/><path d="M9.25 5.77 A9.5 9.5 0 0 1 20.36 6.94" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="butt"/><polygon points="22.39,9.54 23.43,3.52 17.28,10.36" fill="currentColor"/></g><line class="slash-halo" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/><line class="slash" x1="3.5" y1="24.5" x2="24.5" y2="3.5"/></svg></span><span class="word"><span class="wt">FULL AUTO</span></span><span class="pips"><span class="pip" data-k="fio2">FiO₂</span><span class="pip" data-k="peep">PEEP</span><span class="pip" data-k="vt">VT</span><span class="pip" data-k="rr">RR</span></span></span>
         <span class="zone switch"><span class="aword">SWITCH TO MANUAL</span><span class="hint"></span></span>
       </button>
       <button id="gostop" class="is-running"><span class="pre">EMERGENCY</span><span class="word">STOP</span><span class="sub"></span></button>
@@ -875,8 +883,11 @@ function renderTop(){
   $('#vent-since').textContent = dhm(S.startT + (!S.running ? S.runSince : Math.max(S.runSince, S.modeSince))*1000);
   $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓<br>${dhm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
-  lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
-  lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : 'AUTO';
+  const held = ORDER.filter(k => overrideLeft(k) > 0), partial = S.running && S.mode==='AUTO' && held.length > 0;
+  lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : partial ? 'is-partial' : 'is-running';
+  lb.querySelector('.wt').textContent = !S.running ? 'STOPPED' : manual ? 'MANUAL' : partial ? 'PARTIAL OVERRIDE' : 'FULL AUTO';
+  lb.querySelector('.word').classList.toggle('long', partial);
+  lb.querySelectorAll('.pip').forEach(pp => { const k=pp.dataset.k; const mine = S.running && S.mode==='AUTO' && overrideLeft(k)<=0; pp.className = 'pip ' + (mine ? 'clover' : 'user'); });
   const mArmed = S.modeArm!=null, mLeft = mArmed ? Math.ceil((5000 - (performance.now()-S.modeArm))/1000) : 0;
   lb.classList.toggle('armed', mArmed);
   lb.querySelector('.aword').textContent = mArmed ? (S.mode==='AUTO' ? 'CONFIRM MANUAL' : 'CONFIRM AUTO') : (S.mode==='AUTO' ? 'SWITCH TO MANUAL' : 'SWITCH TO AUTO');
