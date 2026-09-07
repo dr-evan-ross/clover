@@ -703,7 +703,7 @@ function applyChange(k, to, src, detail){
   S.setBy[k] = { src, t:S.t };
   S.lastCmd = { what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t };
   if (src === 'USER'){
-    S.override[k] = { until: S.t + OVR() };
+    if (S.running && S.mode==='AUTO') S.override[k] = { until: S.t + OVR() };   // an override only means something while CLOVER is in charge
     addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${S.cfg.overrideMin} min unless released.` : 'Manual adjustment by operator in MANUAL mode; sent to the ventilator.'));
   } else {
     addLog('CTRL', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail);
