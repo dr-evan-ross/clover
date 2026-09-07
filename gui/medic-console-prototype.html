@@ -869,8 +869,8 @@ function renderControls(){
     el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='override' ? `USER IN CONTROL · ${cellsHTML(mmss(ov))}` : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
     el.querySelector('.contract').innerHTML = owner==='clover'
-      ? (p ? `NOW ${P[k].fmt(S.vent[k])} → OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN` : `OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN`)
-      : (p ? `NOW ${P[k].fmt(S.vent[k])} → SENDS TO VENT` : 'USER SETTING · APPLY SENDS TO VENT');
+      ? `OVERRIDE FOR ${cellsHTML(S.cfg.overrideMin)} MIN`
+      : 'USER SETTING · APPLY SENDS TO VENT';
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
