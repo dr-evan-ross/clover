@@ -124,10 +124,22 @@ controller status line was tried here and removed as low-value.) The clock is a 
 LOCAL / ZULU; every displayed time, including the log, follows it.
 
 Left column (268 px), rows **354 / 64 / 280 / 130**:
-1. **Ventilator card** (beside the vitals): CONNECTED / LINK LOST with dot, make and model
-   (placeholder Zoll 731 EMV+), then link and rate, mode-since time, serial, vent mode,
-   last command with acknowledgement and time, battery with runtime, O₂ supply. Hosts the
-   demo-only SIM button. Goes critical red and pulses on link loss.
+1. **Ventilator card** (beside the vitals): headline CONNECTED / DEGRADED / CHECK VENT /
+   LINK LOST, make and model (placeholder Zoll 731 EMV+), then five interconnection rows,
+   each a green/amber/red pill; the card's colour follows the worst row.
+   | Row | Good | Degraded | Bad |
+   |---|---|---|---|
+   | Link | CONNECTED · 1 Hz | STALE n S | LOST m:ss |
+   | Commands | ACK hh:mm | PENDING | REJECTED |
+   | Settings | MATCH | MISMATCH · VT | — |
+   | Remote control | GRANTED | PANEL LOCKED | LOCAL OVERRIDE |
+   | Vent alarms | NONE | n · LOW O₂ | n · HIGH PRESSURE |
+   Footer: battery and runtime, O₂ supply, serial, vent mode, mode-since date-time. Hosts the
+   demo-only SIM button. Behaviours: a stale stream holds the controller, blanks the
+   waveforms and locks the controls like a lost link; a rejected command leaves the setting
+   unchanged and is logged as REJECTED; a read-back mismatch is shown for 5 s, then CLOVER
+   adopts the ventilator's value and treats it as a user override (local panel activity =
+   override); vent alarms also appear in the alerts band with a VENT · prefix.
 1b. **SETUP** button (beside the summary row): opens the provider-level panel. Currently
    the override lockout stepper (real) plus placeholders for controller limits, alarm
    limits, emergency O₂ exemption, decision cycle, ventilator setup, custom layout.

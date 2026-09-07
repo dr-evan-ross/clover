@@ -163,17 +163,30 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #ptcard .dot{width:16px;height:16px;border-radius:50%;flex:none}
 #ptcard .word{font-family:var(--f-disp);font-weight:700;font-size:26px;letter-spacing:.1em;line-height:1}
 #ptcard .model{font-family:var(--f-disp);font-weight:600;font-size:20px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#ptcard .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:14px;margin-top:0;line-height:1.15}
-#ptcard .kv dt{color:var(--ink2);margin:0;white-space:nowrap}
-#ptcard .kv dd{margin:0;font-family:var(--f-disp);font-weight:600;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip;min-width:0}
+#ptcard .srows{display:flex;flex-direction:column;gap:5px;margin-top:2px}
+#ptcard .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;height:22px;font-size:13px;color:var(--ink2)}
+#ptcard .srow span{white-space:nowrap}
+#ptcard .st{font-family:var(--f-disp);font-weight:700;font-size:11px;letter-spacing:.08em;padding:0 8px;height:22px;display:flex;align-items:center;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+#ptcard .st.ok{background:#245a1a;color:#d4f2c0}
+#ptcard .st.warn{background:#7a5f14;color:#fff0c2}
+#ptcard .st.bad{background:#8a2a1c;color:#ffe3dc}
+#ptcard .st.off{background:var(--g4);color:var(--ink2)}
+#ptcard .vfoot{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--ink2);margin-top:4px;white-space:nowrap}
+#ptcard .vfoot b{font-family:var(--f-disp);font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 #ptcard.is-conn{border-color:var(--go)}
 #ptcard.is-conn .dot{background:var(--go);box-shadow:0 0 0 3px #1e3416}
 #ptcard.is-conn .word{color:#9bd67a}
+#ptcard.is-warn{border-color:var(--warn);background:#1a1508}
+#ptcard.is-warn .dot{background:var(--warn);box-shadow:0 0 0 3px #3a2d0f}
+#ptcard.is-warn .word{color:#f0c95c}
+#ptcard.is-bad{border-color:#d6614a;background:linear-gradient(180deg,#a03a28,#7a2818);animation:crit-pulse 1.2s ease-in-out infinite}
+#ptcard.is-bad .dot{background:none;box-shadow:inset 0 0 0 3px #fbe9e2}
+#ptcard.is-bad .word,#ptcard.is-bad .model{color:#fbe9e2}
+#ptcard.is-bad .srow,#ptcard.is-bad .vfoot,#ptcard.is-bad .lab{color:#f5cfc7}
+#ptcard.is-bad .vfoot b{color:#fff}
 #ptcard.is-lost{border-color:#d6614a;background:linear-gradient(180deg,#a03a28,#7a2818);animation:crit-pulse 1.2s ease-in-out infinite}
 #ptcard.is-lost .dot{background:none;box-shadow:inset 0 0 0 3px #fbe9e2}
 #ptcard.is-lost .word{color:#fbe9e2}
-#ptcard.is-lost .model,#ptcard.is-lost .kv dd{color:#fbe9e2}
-#ptcard.is-lost .kv dt,#ptcard.is-lost .lab{color:#f5cfc7}
 #simbtn{margin-top:auto;height:28px;border:1px dashed var(--line2);color:var(--ink3);font-size:11px;letter-spacing:.16em}
 #simbtn:active{color:var(--ink)}
 
@@ -442,15 +455,14 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
         <span class="lab">Ventilator</span>
         <div class="conn"><span class="dot"></span><span class="word">CONNECTED</span></div>
         <div class="model">ZOLL 731 EMV+</div>
-        <dl class="kv">
-          <dt>Link</dt><dd id="vent-meta">USB serial · 1 Hz</dd>
-          <dt>Mode since</dt><dd id="vent-since">—</dd>
-          <dt>Serial</dt><dd>731-04182</dd>
-          <dt>Vent mode</dt><dd>AC (V)</dd>
-          <dt>Last cmd</dt><dd id="vent-cmd">—</dd>
-          <dt>Battery</dt><dd>84% · 2 h 10 m</dd>
-          <dt>O₂ supply</dt><dd>1,640 psi</dd>
-        </dl>
+        <div class="srows">
+          <div class="srow"><span>Link</span><b class="st" id="vs-link"></b></div>
+          <div class="srow"><span>Commands</span><b class="st" id="vs-cmd"></b></div>
+          <div class="srow"><span>Settings</span><b class="st" id="vs-set"></b></div>
+          <div class="srow"><span>Remote control</span><b class="st" id="vs-rem"></b></div>
+          <div class="srow"><span>Vent alarms</span><b class="st" id="vs-alm"></b></div>
+        </div>
+        <div class="vfoot"><span>Batt <b>84%</b> · 2 h 10 m · O₂ <b>1,640 psi</b></span><span>SN 731-04182 · AC (V)</span><span>Mode since <b id="vent-since">—</b></span></div>
         <button id="simbtn">SIM · DEMO SCENARIOS</button>
       </section>
       <button id="advbtn"><span class="word">SETUP</span></button>
@@ -569,6 +581,10 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
     <button data-sim="recover">Patient improves</button>
     <button data-sim="dropout">SpO₂ sensor dropout (40 s)</button>
     <button data-sim="link">Ventilator link drop (25 s)</button>
+    <button data-sim="stale">Data stream stalls (15 s)</button>
+    <button data-sim="reject">Vent rejects next command</button>
+    <button data-sim="panel">Vent panel changes VT → 550</button>
+    <button data-sim="alarm">Vent alarm: high pressure (30 s)</button>
     <span class="lab">Sim speed</span>
     <div class="row"><button data-speed="1" class="on">1×</button><button data-speed="10">10×</button><button data-speed="60">60×</button></div>
   </div>
@@ -613,9 +629,9 @@ const S = {
   vent:{ vt:500, rr:14, peep:5, fio2:0.40 },
   setBy:{}, override:{}, suggest:{}, pending:{},
   patient:{ shunt:0.12, vco2:200, signal:true, signalUntil:0 },
-  vent_link:{ connected:true, lostAt:0, until:0 },
+  vent_link:{ connected:true, lostAt:0, until:0, staleUntil:0, staleAt:0, cmd:{status:'none'}, rejectNext:false, remote:'granted', remoteUntil:0, mismatch:null, alarms:[] },
   spo2:96, etco2:40, f:{spo2:96, etco2:40}, shown:{spo2:96, etco2:40}, hist:[], log:[], alerts:[],
-  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, ie:2, ieEdit:null, lastCmd:null, cfg:{ overrideMin:5 }, cfgEdit:null, flash:true,
+  t:0, startT:0, runSince:0, modeSince:0, o2arm:null, gsArm:null, modeArm:null, prevState:{spo2:'ok',etco2:'ok'}, lastDecision:0, speed:1, lightMode:0, logFilter:'ALL', trend:{spo2:{on:false,win:15}, etco2:{on:false,win:15}}, hover:{}, tedit:{spo2:null, etco2:null}, ie:2, ieEdit:null, cfg:{ overrideMin:5 }, cfgEdit:null, flash:true,
 };
 ORDER.forEach(k => { S.setBy[k] = {src:'SYS', t:0}; S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; });
 
@@ -625,6 +641,9 @@ function addLog(src, title, detail){
   S.log.push({ t:S.t, src, title, detail: detail || '' });
   if (S.log.length > 5000) S.log.shift();
 }
+
+const linkStale = () => S.vent_link.connected && S.t < S.vent_link.staleUntil;
+const linkOK = () => S.vent_link.connected && !linkStale();
 
 /* ---------------- patient model (simulation only) ---------------- */
 function stepPatient(){
@@ -638,10 +657,16 @@ function stepPatient(){
   S.etco2 += (etss - S.etco2)/90 + (Math.random()-0.5)*0.4;
   if (!p.signal && S.t >= p.signalUntil){ p.signal = true; addLog('SYS','SpO₂ signal restored',''); }
   const L=S.vent_link; if (!L.connected && S.t >= L.until){ L.connected = true; addLog('SYS','Ventilator link restored', `ZOLL 731 EMV+ reconnected after ${mmss(S.t-L.lostAt)}. Settings verified unchanged.`); }
+  if (L.staleAt && S.t >= L.staleUntil && L.staleUntil){ L.staleUntil=0; addLog('SYS','Ventilator data stream resumed', `Stream stalled for ${mmss(S.t-L.staleAt)}; frames current again.`); L.staleAt=0; }
+  if (L.remote==='local' && S.t >= L.remoteUntil){ L.remote='granted'; addLog('SYS','Ventilator remote control: granted','No further local panel activity.'); }
+  if (L.mismatch && S.t - L.mismatch.at >= 5){ const m=L.mismatch; L.mismatch=null; const k=m.k, from=S.vent[k];
+    S.vent[k]=m.val; S.setBy[k]={src:'USER',t:S.t}; if (S.running && S.mode==='AUTO') S.override[k]={until:S.t+OVR()};
+    addLog('SYS', `Vent panel changed ${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,m.val)}`, `Read-back mismatch confirmed for 5 s; CLOVER adopts the ventilator's value and treats it as a user override${S.running && S.mode==='AUTO' ? ` for ${S.cfg.overrideMin} min` : ''}.`); }
+  L.alarms = L.alarms.filter(a => S.t < a.until);
   /* display filter: ~5 s moving average, and the shown integer only changes once the average has moved 0.75 past it */
   S.f.spo2 += (S.spo2 - S.f.spo2)*0.2; S.f.etco2 += (S.etco2 - S.f.etco2)*0.2;
   ['spo2','etco2'].forEach(k => { if (Math.abs(S.f[k] - S.shown[k]) >= 0.75) S.shown[k] = Math.round(S.f[k]); });
-  S.hist.push({ t:S.t, spo2: p.signal ? S.f.spo2 : null, etco2:S.f.etco2 });
+  if (linkStale()) S.hist.push({ t:S.t, spo2:null, etco2:null }); else S.hist.push({ t:S.t, spo2: p.signal ? S.f.spo2 : null, etco2:S.f.etco2 });
   if (S.hist.length > 3700) S.hist.shift();
 }
 
@@ -701,9 +726,12 @@ function controllerDecide(){
 
 function applyChange(k, to, src, detail){
   const from = S.vent[k];
+  const L=S.vent_link;
+  if (L.rejectNext){ L.rejectNext=false; L.cmd={status:'rejected', what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t};
+    addLog('SYS', `Ventilator REJECTED ${P[k].plain} → ${fmtP(k,to)}`, `Command from ${src==='CTRL'?'CLOVER':'operator'} refused by the ventilator (reported: out of device range). ${P[k].plain} remains ${fmtP(k,from)}.`); return false; }
+  L.cmd={status:'ack', what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t};
   S.vent[k] = to;
   S.setBy[k] = { src, t:S.t };
-  S.lastCmd = { what:`${P[k].plain} ${fmtP(k,to)}`, t:S.t };
   if (src === 'USER'){
     if (S.running && S.mode==='AUTO') S.override[k] = { until: S.t + OVR() };   // an override only means something while CLOVER is in charge
     addLog('USER', `${S.running && S.mode==='AUTO' ? 'OVERRIDE ' : ''}${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail || (S.running && S.mode==='AUTO' ? `Operator took ${P[k].plain} from CLOVER. Controller will not adjust ${P[k].plain} for ${S.cfg.overrideMin} min unless released.` : 'Manual adjustment by operator in MANUAL mode; sent to the ventilator.'));
@@ -711,12 +739,14 @@ function applyChange(k, to, src, detail){
     addLog('CTRL', `${P[k].plain} ${fmtP(k,from)} → ${fmtP(k,to)}`, detail);
   }
   S.suggest[k] = null;
+  return true;
 }
 
 function runController(trigger){
   const remaining = DECISION_PERIOD - (S.t - S.lastDecision);
   S.lastDecision = S.t;
   if (!S.vent_link.connected){ addLog('CTRL','Holding — ventilator link lost','Cannot send commands to the ventilator. No changes attempted; will re-evaluate when the link returns.'); return; }
+  if (linkStale()){ addLog('CTRL','Holding — ventilator data stale',`No fresh frames for ${mmss(S.t-S.vent_link.staleAt)}. Not acting on old data.`); return; }
   const d = controllerDecide();
   const reasoning = (trigger ? `EARLY DECISION — ${trigger} with ${mmss(Math.max(0,remaining))} left in the ${DECISION_PERIOD} s cycle. ` : '') + d.why.join(' ');
   if (S.mode === 'AUTO'){
@@ -735,7 +765,13 @@ function runController(trigger){
 function evalAlerts(){
   const want = [];
   const sp=S.shown.spo2, et=S.shown.etco2, v=S.vent;
-  if (!S.vent_link.connected) want.push({ id:'link', sev:'crit', txt:`Ventilator link lost — check cable · no data for ${mmss(S.t-S.vent_link.lostAt)}` });
+  const L=S.vent_link;
+  if (!L.connected) want.push({ id:'link', sev:'crit', txt:`Ventilator link lost — check cable · no data for ${mmss(S.t-L.lostAt)}` });
+  else if (linkStale()) want.push({ id:'stale', sev:'warn', txt:`Ventilator data stale — no new frames for ${mmss(S.t-L.staleAt)}` });
+  if (L.cmd.status==='rejected') want.push({ id:'rej', sev:'crit', txt:`Ventilator rejected last command — ${L.cmd.what}` });
+  if (L.mismatch) want.push({ id:'mis', sev:'warn', txt:`Setting mismatch — vent reports ${P[L.mismatch.k].plain} ${fmtP(L.mismatch.k,L.mismatch.val)}, CLOVER set ${fmtP(L.mismatch.k,S.vent[L.mismatch.k])}` });
+  if (L.remote==='local') want.push({ id:'local', sev:'warn', txt:'Vent panel adjusted locally — treated as user override' });
+  L.alarms.forEach(a => want.push({ id:'valm-'+a.id, sev:a.sev, txt:`VENT · ${a.txt}` }));
   if (!S.patient.signal) want.push({ id:'sig', sev:'crit', txt:'SpO₂ signal lost — check probe' });
   else if (sp < 88) want.push({ id:'spo2', sev:'crit', txt:`SpO₂ ${sp.toFixed(0)}% — critically low` });
   else if (sp < 92) want.push({ id:'spo2', sev:'warn', txt:`SpO₂ ${sp.toFixed(0)}% — below target` });
@@ -881,7 +917,7 @@ function renderControls(){
       : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
       : (p ? 'SEND TO VENT' : 'USER SETTING');
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
-    const linked = S.vent_link.connected && S.running;
+    const linked = linkOK() && S.running;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
     el.querySelector('.inc').disabled = !linked || (p?p.v:S.vent[k]) >= P[k].max - 1e-9;
     el.querySelector('.apply').disabled = !linked;
@@ -905,11 +941,17 @@ function renderTop(){
   $('#s-mve').textContent = mve.toFixed(1); $('#s-vte').textContent = vte; $('#s-leak').textContent = leak;
   $('#s-ppk').textContent = Math.round(S.vent.peep + S.vent.vt/28 + 2); $('#s-ppl').textContent = Math.round(S.vent.peep + S.vent.vt/40 + 1);
   const pc=$('#ptcard'), L=S.vent_link;
-  pc.className = L.connected ? 'is-conn' : 'is-lost';
-  pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
-  $('#vent-meta').innerHTML = L.connected ? (S.running ? 'USB serial · 1 Hz' : 'monitor only') : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
+  const st=(el,cls,txt)=>{ el.className='st '+cls; el.innerHTML=txt; };
+  const stale=linkStale(), almWorst = L.alarms.some(a=>a.sev==='crit') ? 'bad' : L.alarms.length ? 'warn' : 'ok';
+  st($('#vs-link'), !L.connected?'bad':stale?'warn':'ok', !L.connected ? `LOST ${cellsHTML(mmss(S.t-L.lostAt))}` : stale ? `STALE ${cellsHTML(Math.round(S.t-L.staleAt))} S` : (S.running ? 'CONNECTED · 1 Hz' : 'MONITOR ONLY'));
+  st($('#vs-cmd'), L.cmd.status==='rejected'?'bad':L.cmd.status==='pending'?'warn':L.cmd.status==='ack'?'ok':'off', L.cmd.status==='rejected' ? 'REJECTED' : L.cmd.status==='pending' ? 'PENDING' : L.cmd.status==='ack' ? `ACK ${hm(S.startT+L.cmd.t*1000)}` : 'NONE SENT');
+  st($('#vs-set'), L.mismatch?'warn':'ok', L.mismatch ? `MISMATCH · ${P[L.mismatch.k].plain}` : 'MATCH');
+  st($('#vs-rem'), L.remote==='local'?'bad':L.remote==='locked'?'warn':(S.running?'ok':'off'), L.remote==='local' ? 'LOCAL OVERRIDE' : L.remote==='locked' ? 'PANEL LOCKED' : (S.running ? 'GRANTED' : 'RELEASED'));
+  st($('#vs-alm'), almWorst, L.alarms.length ? `${L.alarms.length} · ${L.alarms[0].txt}` : 'NONE');
+  const worst = (!L.connected || L.cmd.status==='rejected' || L.remote==='local' || almWorst==='bad') ? 'bad' : (stale || L.mismatch || L.remote==='locked' || almWorst==='warn') ? 'warn' : 'ok';
+  pc.className = worst==='bad' ? 'is-bad' : worst==='warn' ? 'is-warn' : 'is-conn';
+  pc.querySelector('.word').textContent = !L.connected ? 'LINK LOST' : worst==='bad' ? 'CHECK VENT' : worst==='warn' ? 'DEGRADED' : 'CONNECTED';
   $('#vent-since').textContent = dhm(S.startT + (!S.running ? S.runSince : Math.max(S.runSince, S.modeSince))*1000);
-  $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓<br>${dhm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   const held = ORDER.filter(k => overrideLeft(k) > 0), partial = S.running && S.mode==='AUTO' && held.length > 0;
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : partial ? 'is-partial' : 'is-running';
@@ -1092,7 +1134,11 @@ $('#sim').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!
   if(b.dataset.sim==='hypo'){ p.vco2=300; addLog('SYS','[sim] CO₂ production up','VCO₂ factor → 300'); }
   if(b.dataset.sim==='recover'){ p.shunt=0.12; p.vco2=200; addLog('SYS','[sim] Patient improving','Shunt 0.12, VCO₂ 200'); }
   if(b.dataset.sim==='dropout'){ p.signal=false; p.signalUntil=S.t+40; addLog('SYS','[sim] SpO₂ probe disconnected',''); }
-  if(b.dataset.sim==='link'){ S.vent_link={connected:false, lostAt:S.t, until:S.t+25}; addLog('SYS','[sim] Ventilator cable disconnected',''); }
+  if(b.dataset.sim==='link'){ Object.assign(S.vent_link,{connected:false, lostAt:S.t, until:S.t+25}); addLog('SYS','[sim] Ventilator cable disconnected',''); }
+  if(b.dataset.sim==='stale'){ Object.assign(S.vent_link,{staleAt:S.t, staleUntil:S.t+15}); addLog('SYS','[sim] Ventilator data stream stalled','Link up, no new frames.'); }
+  if(b.dataset.sim==='reject'){ S.vent_link.rejectNext=true; addLog('SYS','[sim] Ventilator will reject the next command',''); }
+  if(b.dataset.sim==='panel'){ Object.assign(S.vent_link,{mismatch:{k:'vt', val:550, at:S.t}, remote:'local', remoteUntil:S.t+20}); addLog('SYS','[sim] Someone set VT 550 on the ventilator panel',''); }
+  if(b.dataset.sim==='alarm'){ S.vent_link.alarms.push({id:'hp'+S.t, txt:'HIGH PRESSURE', sev:'crit', until:S.t+30}); addLog('SYS','[sim] Ventilator high-pressure alarm',''); }
   $('#sim').classList.remove('open'); });
 
 /* ---------------- waveforms: synthetic pleth + capnogram, sweeping with an erase bar ---------------- */
@@ -1103,14 +1149,14 @@ function initWaves(){
 }
 function waveSample(k, t){
   if (k==='spo2'){
-    if (!S.vent_link.connected) return NaN;                                        // no link: trace absent, same as the capnogram
+    if (!linkOK()) return NaN;                                                     // no link or stale stream: trace absent, same as the capnogram
     if (!S.patient.signal) return 0.5 + (Math.random()-0.5)*0.06;                 // probe off: noisy flat line
     const hr = clamp(70 + (96 - S.f.spo2)*3, 60, 140), ph = (t*hr/60) % 1;
     const perf = clamp((S.f.spo2-70)/30, 0.35, 1);
     const y = Math.exp(-Math.pow((ph-0.12)/0.07,2)) + 0.5*Math.exp(-Math.pow((ph-0.42)/0.14,2));
     return 0.12 + 0.78*perf*clamp(y,0,1) + (Math.random()-0.5)*0.01;
   }
-  if (!S.vent_link.connected) return NaN;                                          // no vent data: trace absent
+  if (!linkOK()) return NaN;                                                       // no vent data: trace absent
   const T = 60/S.vent.rr, ph = (t/T) % 1, et = S.f.etco2/70;                        // scale 0–70 mmHg
   let y;
   if (ph < 0.05) y = et*0.92*(ph/0.05);                                            // phase II upstroke
