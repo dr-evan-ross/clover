@@ -554,6 +554,8 @@ const $ = s => document.querySelector(s);
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 const pad = n => String(n).padStart(2,'0');
 let TZ = 'local';
+const MON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const dhm = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCDate())} ${MON[d.getUTCMonth()]} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` : `${pad(d.getDate())} ${MON[d.getMonth()]} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const hms = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
 const hm  = ms => { const d = new Date(ms); return TZ==='utc' ? `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` : `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const mmss = s => `${Math.floor(s/60)}:${pad(Math.floor(s%60))}`;
@@ -869,7 +871,7 @@ function renderTop(){
   pc.className = L.connected ? 'is-conn' : 'is-lost';
   pc.querySelector('.word').textContent = L.connected ? 'CONNECTED' : 'LINK LOST';
   $('#vent-meta').innerHTML = L.connected ? 'USB serial · 1 Hz' : `LOST ${cellsHTML(mmss(S.t-L.lostAt))}`;
-  $('#vent-since').textContent = !S.running ? 'stopped ' + hm(S.startT + S.runSince*1000) : hm(S.startT + Math.max(S.runSince, S.modeSince)*1000);
+  $('#vent-since').textContent = dhm(S.startT + (!S.running ? S.runSince : Math.max(S.runSince, S.modeSince))*1000);
   $('#vent-cmd').innerHTML = S.lastCmd ? `${esc(S.lastCmd.what)} ✓ ${hm(S.startT+S.lastCmd.t*1000)}` : 'none yet';
   const lb=$('#loopbox'), manual = S.running && S.mode==='MANUAL';
   lb.className = !S.running ? 'is-halted' : manual ? 'is-manual' : 'is-running';
