@@ -49,7 +49,7 @@ still.
 7. **Who is in charge of each setting is always explicit.** Every control tile carries an
    ownership band across its top and a matching colour scheme: green "CLOVER IN CONTROL"
    when the controller may change it (AUTO, running, no override); amber "USER IN CONTROL" when
-   only the operator can (MANUAL, an active override with its countdown, or STOPPED).
+   only the operator can (MANUAL, an active override with its countdown, or DISENGAGED).
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
    **The ± contract is stated before it is accepted:** every control tile has a permanent
@@ -58,7 +58,7 @@ still.
    once an override is running, which is the only place the countdown appears; the band
    previews "CLOVER IN
    CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
-   existing override, STOPPED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
+   existing override, DISENGAGED): "USER SETTING · APPLY SENDS TO VENT" with an APPLY button.
    The minutes are read live from the override lockout set in SETUP (1–30 min, default 5).
 8. **One strict grid.** The top bar is split into boxes matching the columns beneath.
    Left-column row heights equal right-column row heights exactly. All row heights are
@@ -68,8 +68,8 @@ still.
 
 | Use | Never |
 |---|---|
-| FULL AUTO, PARTIAL OVERRIDE, MANUAL, STOPPED | AUTOMATIC, HYBRID, MANUAL MODE, HALTED |
-| START, EMERGENCY STOP | GO, HALT |
+| FULL AUTO, PARTIAL OVERRIDE, MANUAL, DISENGAGED | AUTOMATIC, HYBRID, MANUAL MODE, HALTED, DISENGAGED |
+| ENGAGE, DISENGAGE (CLOVER from the vent) | START, STOP, GO, HALT |
 | UPDATE (force a decision) | DECIDE NOW |
 | BRIGHT, DIM, RED (display) | DAY, LIGHT |
 | RETURN TO CLOVER (release override) | — |
@@ -88,7 +88,7 @@ Tactical low-light palette, single theme (always dark).
 | ink | `#d3dac6` / `#8d9a7e` / `#5b6850` | text, secondary, muted |
 | go / auto | `#5f9e3b` | AUTO state, START, connected, in-range band |
 | warn | `#d5a02c` | MANUAL state, out-of-range fill, APPLY, overrides |
-| crit / stop | `#d84b38` / `#b7402c` | STOPPED, critical fill, STOP button, CONFIRM |
+| crit / stop | `#d84b38` / `#b7402c` | DISENGAGED, critical fill, STOP button, CONFIRM |
 | info | `#6d9ab8` | informational alerts, signal loss |
 | SpO₂ identity | `#7fc4e6` (cyan) | SpO₂ number/label, FiO₂ and PEEP names, SpO₂ trend line |
 | etCO₂ identity | `#f0dc7a` (yellow) | etCO₂ number/label, VT and RR names, etCO₂ trend line |
@@ -131,17 +131,21 @@ Left column (268 px), rows **354 / 64 / 280 / 130**:
    the override lockout stepper (real) plus placeholders for controller limits, alarm
    limits, emergency O₂ exemption, decision cycle, ventilator setup, custom layout.
 2. **Mode tile** (one button, the height of the control tiles it governs): "Current mode" label
-   · rotating loop icon · FULL AUTO / PARTIAL OVERRIDE / MANUAL / STOPPED · a fixed strip of
+   · rotating loop icon · FULL AUTO / PARTIAL OVERRIDE / MANUAL / DISENGAGED · a fixed strip of
    four pips (FiO₂ PEEP VT RR, same order as the control tiles) each green or amber to
    mirror that tile's ownership band, so the tile summarises ownership without inventing a
    new colour. PARTIAL OVERRIDE = AUTO with at least one override: green ground, amber
-   border and word, icon still stepping because the loop is still running · rotating loop icon · AUTO/MANUAL/STOPPED · a plain action line in the
+   border and word, icon still stepping because the loop is still running · rotating loop icon · AUTO/MANUAL/DISENGAGED · a plain action line in the
    tile's own colour, SWITCH TO MANUAL / SWITCH TO AUTO (reads CONFIRM … while armed) ·
    the arm/confirm hint. No box and no target-colour preview: it was confusing. No rule, no "Switch to" label. Tapping
-   anywhere arms; second tap confirms; inert when STOPPED. State and control in one place.
-3. **EMERGENCY STOP / START** button (beside alerts). Reads EMERGENCY over STOP while
-   running, START when stopped; no explanatory text. Arm + confirm like the other
-   state changes; the confirm countdown is the only text that appears.
+   anywhere arms; second tap confirms; inert when DISENGAGED. State and control in one place.
+3. **DISENGAGE / ENGAGE CLOVER** button (beside alerts), red. DISENGAGE releases the
+   ventilator entirely: CLOVER sends no commands and no advisories, and the vent runs on
+   its own front panel. This is the emergency action for a misbehaving controller, and it
+   is deliberately different from SWITCH TO MANUAL (the medic drives the vent through
+   this screen while CLOVER watches and suggests). One line of effect text is shown:
+   "Releases the vent to its own controls. Ventilation continues." ENGAGE reads the
+   settings back from the vent and resumes in MANUAL. Arm + confirm.
 
 Right column, rows **354 / 64 / 280 / 130**:
 1. **SpO₂** and **etCO₂** tiles (target range button, big number, a 90 px waveform strip
@@ -161,7 +165,7 @@ Right column, rows **354 / 64 / 280 / 130**:
 ## 7. The loop icon
 
 Three arc arrows (72° each) chasing around a circle. In AUTO it steps 12° once per
-second (30 s per revolution, matching the decision cycle). In MANUAL and STOPPED the
+second (30 s per revolution, matching the decision cycle). In MANUAL and DISENGAGED the
 rotation is **paused, not removed**, so the angle is preserved across mode changes, and a
 diagonal slash (with a halo in the tile's background colour) cuts through it. The rotation
 is applied to the arrows only; the slash never rotates.
@@ -173,7 +177,10 @@ is applied to the arrows only; the slash never rotates.
   signal triggers an immediate decision and restarts the cycle. Edge-triggered only.
 - **UPDATE** button forces a decision immediately.
 - **MANUAL**: controller computes and logs advisories, posts SUGGESTS chips, applies nothing.
-- **STOPPED**: controller does nothing; ventilator holds current settings.
+- **DISENGAGED**: CLOVER is off the vent. No commands, no advisories, no adjustments from
+  this screen: every control tile greys out with a VENT PANEL IN CONTROL band and the mode
+  tile reads DISENGAGED with grey pips. Emergency O₂ and I:E are refused. The ventilator
+  card shows the link as monitor only.
 - **User override**: locks that parameter against the controller for the SETUP lockout
   (default 5 min), shown as a countdown; RETURN TO CLOVER cancels it early and forces an immediate decision.
 - **Emergency O₂**: FiO₂ → 100% from the SpO₂ tile, arm + CONFIRM, works in any mode,
