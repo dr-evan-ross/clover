@@ -873,8 +873,8 @@ function renderControls(){
     el.className = 'ctl ' + (owner==='clover' ? 'own-clover' : owner==='vent' ? 'own-none' : 'own-user') + (p?' pending':'') + (ov>0?' overridden':'') + (sg!=null && S.mode==='MANUAL' && !p ?' has-sugg':'');
     el.querySelector('.who').innerHTML = (p && owner==='clover') ? 'CLOVER IN CONTROL → USER?' : owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(p?p.v:S.vent[k]);
-    el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE FOR ${cellsHTML(mmss(OVR()))}`
-      : owner==='override' ? `OVERRIDE FOR ${cellsHTML(mmss(ov))}`
+    el.querySelector('.contract').innerHTML = owner==='clover' ? `OVERRIDE DURATION ${cellsHTML(mmss(OVR()))}`
+      : owner==='override' ? `AUTO RESUMES IN ${cellsHTML(mmss(ov))}`
       : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
       : 'USER SETTING';
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';

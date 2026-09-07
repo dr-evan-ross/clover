@@ -53,9 +53,10 @@ still.
    Who set the value *last* is deliberately not shown on the tile, only the set time,
    because it is easily confused with who is in charge *now*. The log has the history.
    **The ± contract is stated before it is accepted:** every control tile has a permanent
-   contract line above its ± buttons. CLOVER-controlled: "OVERRIDE FOR 5:00" (the SETUP lockout as m:ss),
-   turning amber while an adjustment is pending and counting down ("OVERRIDE FOR 4:32")
-   once an override is running, which is the only place the countdown appears; the band
+   contract line above its ± buttons. CLOVER-controlled: "OVERRIDE DURATION 5:00" (the SETUP lockout as m:ss),
+   turning amber while an adjustment is pending; once an override is running it becomes
+   "AUTO RESUMES IN 4:32", counting down, which is the only place the countdown appears and
+   says what happens when it ends; the band
    previews "CLOVER IN
    CONTROL → USER?" and the confirm button reading OVERRIDE. User-controlled (MANUAL,
    existing override, DISENGAGED): "USER SETTING" with an APPLY button.
