@@ -339,8 +339,8 @@ button:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
 #c-rr .name,#c-vt .name{color:var(--etco2)}
 
 .ctl .unit{font-size:13px;letter-spacing:.1em;color:var(--ink2);text-transform:uppercase}
-.ctl .num{font-family:var(--f-disp);font-weight:700;font-size:58px;line-height:1;text-align:center;align-self:center;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.ctl .num .prop{display:block;font-family:var(--f-disp);font-weight:700;font-size:12px;letter-spacing:.1em;color:var(--warn);height:16px;line-height:16px;margin-top:2px;text-align:center}
+.ctl .num{font-family:var(--f-disp);font-weight:700;font-size:54px;line-height:1;text-align:center;align-self:center;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.ctl .num .prop{display:block;font-family:var(--f-disp);font-weight:700;font-size:17px;letter-spacing:.06em;color:var(--warn);height:20px;line-height:20px;margin-top:2px;text-align:center;white-space:nowrap}
 .ctl .contract{font-family:var(--f-disp);font-weight:600;font-size:11px;letter-spacing:.1em;color:var(--ink2);text-align:center;white-space:nowrap;line-height:16px}
 .ctl.pending .contract,.ctl.overridden .contract{color:var(--warn)}
 .ctl .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -874,10 +874,10 @@ function renderControls(){
     el.querySelector('.who').innerHTML = owner==='clover' ? 'CLOVER IN CONTROL' : owner==='vent' ? 'VENT PANEL IN CONTROL' : 'USER IN CONTROL';
     el.querySelector('.v').textContent = P[k].fmt(S.vent[k]);
     el.querySelector('.prop').textContent = p ? `PROPOSED ${fmtP(k,p.v)}` : '\u00a0';
-    el.querySelector('.contract').innerHTML = owner==='clover' ? (p ? `OVERRIDE ${esc(fmtP(k,p.v))} FOR ${cellsHTML(mmss(OVR()))}` : `OVERRIDE DURATION ${cellsHTML(mmss(OVR()))}`)
-      : owner==='override' ? (p ? `SEND ${esc(fmtP(k,p.v))} TO VENT` : `AUTO RESUMES IN ${cellsHTML(mmss(ov))}`)
+    el.querySelector('.contract').innerHTML = owner==='clover' ? (p ? `OVERRIDE FOR ${cellsHTML(mmss(OVR()))}` : `OVERRIDE DURATION ${cellsHTML(mmss(OVR()))}`)
+      : owner==='override' ? (p ? 'SEND TO VENT' : `AUTO RESUMES IN ${cellsHTML(mmss(ov))}`)
       : owner==='vent' ? 'ADJUST ON THE VENTILATOR'
-      : (p ? `SEND ${esc(fmtP(k,p.v))} TO VENT` : 'USER SETTING');
+      : (p ? 'SEND TO VENT' : 'USER SETTING');
     el.querySelector('.apply').textContent = owner==='clover' ? 'OVERRIDE' : 'APPLY';
     const linked = S.vent_link.connected && S.running;
     el.querySelector('.dec').disabled = !linked || (p?p.v:S.vent[k]) <= P[k].min + 1e-9;
