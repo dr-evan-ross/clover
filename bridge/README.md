@@ -5,8 +5,11 @@ the controller, and keeps the log of record. See `CONTRACT.md` for the interface
 
 ## The easy way: one launcher, two browser pages
 
-From the `clover` folder, double-click `start_clover.sh` (Linux/macOS) or `start_clover.py`
-(Windows), or run `python3 start_clover.py`. It finds the Python with the Pulse bindings
+From the `clover` folder, double-click **CLOVER Demo.desktop** (Linux; the first time, KDE or
+GNOME may ask you to trust or "allow launching" it), or `start_clover.py` on Windows, or run
+`./start_clover.sh` from a terminal. On Linux file managers a `.sh` opens in the editor rather
+than running, which is why the desktop launcher exists. The launcher always opens a terminal
+window so you can see what it is doing, and appends to `clover_launcher.log`. It finds the Python with the Pulse bindings
 (the sibling `vent_optimizer/.venv`), starts the bridge, and opens the **control page**:
 
 - **http://localhost:8765/** — pick a patient (28 Pulse states), speed, initial vent

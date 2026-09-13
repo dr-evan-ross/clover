@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=CLOVER Demo
+Comment=Start the CLOVER bridge with the Pulse Physiology Engine and open the control page
+Exec=bash -c 'cd "$(dirname "%k")" && ./start_clover.sh'
+Terminal=true
+Icon=utilities-terminal
+Categories=Science;Medical;
