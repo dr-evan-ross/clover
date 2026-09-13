@@ -1218,7 +1218,8 @@ function waveLoop(now){ if (now - waveLast >= 33){ waveLast = now; drawWaves(now
 /* ---------------- live source: the CLOVER bridge over WebSocket (?ws=ws://host:port) ---------------- */
 let LIVE = new URLSearchParams(location.search).get('ws');
 let ws = null, wsUp = false, wsTimer = null;
-S.wq = { spo2:[], etco2:[] }; S.wrate = { spo2:25, etco2:25 }; S.liveNext = null; S.liveMeasured = null; S.vent_link.liveStale = false; S.vent_link.remoteReported = true;
+S.wq = { spo2:[], etco2:[] }; S.wrate = { spo2:25, etco2:25 };
+S.wstat = { spo2:{n:0,t0:performance.now(),rate:null,pos:0,prev:NaN,starve:0}, etco2:{n:0,t0:performance.now(),rate:null,pos:0,prev:NaN,starve:0} }; S.liveNext = null; S.liveMeasured = null; S.vent_link.liveStale = false; S.vent_link.remoteReported = true;
 function send(o){ if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
 function applyFrame(m){
   S.t = m.t;
@@ -1253,16 +1254,27 @@ function connectLive(){
       applyFrame(m); render();
     } else if (m.type === 'frame'){ applyFrame(m); render(); }
     else if (m.type === 'log'){ S.log.push({ t:m.entry.t, src:m.entry.src, title:m.entry.title, detail:m.entry.detail||'' }); }
-    else if (m.type === 'wave'){ const q = S.wq[m.k]; if (!q) return; S.wrate[m.k] = m.rate || 25; const scale = m.k==='etco2' ? 1/70 : 1;
-      for (const v of m.samples) q.push(v==null ? NaN : v*scale); const max = Math.round(S.wrate[m.k]*3); if (q.length > max) q.splice(0, q.length-max); }
+    else if (m.type === 'wave'){ const q = S.wq[m.k], st = S.wstat[m.k]; if (!q) return; S.wrate[m.k] = m.rate || 25; const scale = m.k==='etco2' ? 1/70 : 1;
+      for (const v of m.samples) q.push(v==null ? NaN : v*scale);
+      st.n += m.samples.length; const el = performance.now() - st.t0; if (el >= 1000){ st.rate = st.n / (el/1000); st.n = 0; st.t0 = performance.now(); }
+      const arrival = st.rate || S.wrate[m.k]; if (q.length > arrival*2) q.splice(0, q.length - Math.round(arrival)); }   // bound latency to ~1 s
   };
 }
 function scheduleReconnect(){ clearTimeout(wsTimer); wsTimer = setTimeout(connectLive, 2000); }
+/* Resample the incoming stream onto sweep columns. Samples arrive at `arrival`/s (measured; declared
+   rate until measured) and the sweep consumes WAVE.sweep columns/s, so each column takes
+   arrival/WAVE.sweep samples: <1 at real time (interpolate between samples), >1 when the bridge
+   runs faster than real time (decimate, so the trace stays continuous but time-compressed). */
 function liveWaveSample(k){
-  const q = S.wq[k], per = Math.max(1, Math.round(S.wrate[k] / WAVE.sweep * 2));
-  if (q.length < per) return NaN;
-  let sum = 0, n = 0; for (let i=0;i<per;i++){ const v = q.shift(); if (!Number.isNaN(v)){ sum += v; n++; } }
-  return n ? sum/n : NaN;
+  const q = S.wq[k], st = S.wstat[k], arrival = st.rate || S.wrate[k];
+  st.pos += arrival / WAVE.sweep;
+  let n = Math.floor(st.pos); st.pos -= n;
+  if (q.length === 0){ st.starve++; return st.starve < 36 ? st.prev : NaN; }   // hold ~0.5 s across jitter, then gap
+  st.starve = 0;
+  if (n === 0){ const nxt = q[0]; return (Number.isNaN(st.prev) || Number.isNaN(nxt)) ? nxt : st.prev + (nxt - st.prev) * st.pos; }
+  let v = NaN; while (n-- > 0 && q.length){ const smp = q.shift(); if (!Number.isNaN(smp)) v = smp; }
+  if (!Number.isNaN(v)) st.prev = v;
+  return v;
 }
 
 /* ---------------- scaling & loop ---------------- */
