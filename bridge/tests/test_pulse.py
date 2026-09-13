@@ -56,7 +56,8 @@ class PulseAdapterTests(unittest.TestCase):
             self.assertLess(min(cap), 5); self.assertGreater(max(cap), 25)
             self.assertGreaterEqual(min(pleth), 0.0); self.assertLessEqual(max(pleth), 1.0)
             # writes: ack in range, reject out of range, read-back in next frame
-            self.assertEqual((await v.set_setting("fio2", 0.6)).status, "ack")
+            res = await v.set_setting("fio2", 0.6)
+            self.assertEqual(res.status, "ack"); self.assertIn("end-expiration", res.message)
             self.assertEqual((await v.set_setting("vt", 2000)).status, "rejected")
             self.assertEqual((await v.set_setting("bogus", 1)).status, "unsupported")
             for _ in range(10):   # read forward past any frame produced before the write
@@ -64,6 +65,13 @@ class PulseAdapterTests(unittest.TestCase):
                 if f.settings["fio2"] == 0.6:
                     break
             self.assertEqual(f.settings["fio2"], 0.6); self.assertEqual(f.settings["vt"], 500)
+            # breath-synchronous application: no merged/giant breath after the change
+            vtes = []
+            for _ in range(10):
+                f = await asyncio.wait_for(frames.__anext__(), 30)
+                if f.measured["vte"] is not None:
+                    vtes.append(f.measured["vte"])
+            self.assertLess(max(vtes), 700, f"a mid-breath restart shows as a ~870 mL breath; saw {max(vtes):.0f}")
             # disturbance: ARDS lowers SpO2 over a few simulated minutes at fixed FiO2
             v.scenario("injury")
             base = f.measured["spo2"]; lowest = base

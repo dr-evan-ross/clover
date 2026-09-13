@@ -40,6 +40,10 @@ Design points that came from the product owner:
   normalised 0..1; capnogram is in mmHg.
 - **Writes cover every GUI setting.** If the device gives no explicit acknowledgement,
   return `ack` only once the read-back matches; the bridge treats read-back as truth anyway.
+  Apply changes breath-synchronously where the device allows it: the Pulse adapter queues a
+  change and applies it at end-expiration, because any mid-breath reconfiguration restarts
+  Pulse's breath cycle (measured: an 869 mL merged breath and a 6 s gap). While queued the
+  GUI shows the command as PENDING; `ack` arrives when it has actually taken effect.
 - **Remote-control state is optional.** `Frame.remote` is `granted` / `locked` / `local` /
   `None`. `None` shows as NOT REPORTED on the GUI; local panel changes are then inferred
   from read-back mismatches.

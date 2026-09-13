@@ -80,6 +80,12 @@ class PulseVent(VentAdapter):
         self._remote_until = 0.0
         self.extra_alarms: list[tuple[Alarm, float]] = []
         self.events: list[dict] = []
+        # breath-synchronous setting changes: Pulse restarts its breath cycle on any configuration
+        # action, so changes are queued and applied at end-expiration, just before the next breath
+        self._pending: dict[str, float] = {}
+        self._pending_waiters: list[asyncio.Future] = []
+        self._last_onset: Optional[float] = None
+        self._prev_paw: float = _NAN
 
     # ------------------------------------------------------------------ VentAdapter
     @staticmethod
@@ -165,10 +171,43 @@ class PulseVent(VentAdapter):
         if self.reject_next:
             self.reject_next = False
             return CommandResult("rejected", "device refused command (simulated)", readback=self.settings[key])
-        await asyncio.sleep(0.2 / self.speed)   # serial round trip
-        self.settings[key] = float(value)
+        # queue for the breath boundary; ack once it has actually been applied
+        self._pending[key] = float(value)
+        fut: asyncio.Future = asyncio.get_event_loop().create_future()
+        self._pending_waiters.append(fut)
+        period = 60.0 / self.settings["rr"]
+        try:
+            await asyncio.wait_for(fut, timeout=(2 * period + 2.0) / self.speed)
+        except asyncio.TimeoutError:
+            return CommandResult("timeout", "no breath boundary observed; change not applied", readback=self.settings[key])
+        return CommandResult("ack", "applied at end-expiration", readback=self.settings[key])
+
+    def _apply_pending(self) -> None:
+        if not self._pending:
+            return
+        self.settings.update(self._pending)
+        self._pending.clear()
         self._apply_vent()
-        return CommandResult("ack", "", readback=self.settings[key])
+        self._last_onset = None            # the cycle restarts now; next onset re-arms the clock
+        for f in self._pending_waiters:
+            if not f.done():
+                f.set_result(True)
+        self._pending_waiters.clear()
+
+    def _breath_clock(self, paw: float) -> None:
+        """Track inspiration onsets from airway pressure and apply queued changes at end-expiration."""
+        thr = self.settings["peep"] + 3.0
+        period = 60.0 / self.settings["rr"]
+        if self._prev_paw == self._prev_paw and paw == paw and self._prev_paw < thr <= paw:
+            if self._last_onset is None or self.t - self._last_onset > 0.5 * period:
+                self._last_onset = self.t
+        self._prev_paw = paw
+        if self._pending:
+            since = None if self._last_onset is None else self.t - self._last_onset
+            at_boundary = since is not None and since >= period - 0.1          # ~100 ms before the next machine breath
+            no_breaths = since is None or since > 2.5 * period                 # apnoea / no cycle: don't wait forever
+            if at_boundary or no_breaths:
+                self._apply_pending()
 
     EFFORT_SEVERITY = {"none": 1.0, "reduced": 0.6, "full": 0.0}   # Pulse dyspnea severity: 1 = no drive
 
@@ -204,7 +243,7 @@ class PulseVent(VentAdapter):
         elif name == "panel":
             k = p.get("key", "vt"); val = float(p.get("value", 550.0))
             if k in self.settings:
-                self.settings[k] = val; self._apply_vent()
+                self._pending[k] = val      # applied at the next breath boundary like any other change
             self.remote, self._remote_until = "local", self.t + 20
         elif name == "alarm":         self.extra_alarms.append((Alarm("sim", str(p.get("text", "HIGH PRESSURE")), p.get("sev", "crit")), self.t + (seconds or float(p.get("seconds", 30)))))
         else:
@@ -290,6 +329,7 @@ class PulseVent(VentAdapter):
                     self.eng.advance_time_s(dt)
                     self.t += dt
                     d = self._pull()
+                    self._breath_clock(d.get("paw", _NAN))
                     pleth.append(self._pleth(d.get("abp", _NAN)))
                     c = d.get("co2", _NAN)
                     capno.append(max(0.0, c) if c == c else _NAN)
