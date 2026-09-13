@@ -642,7 +642,7 @@ function addLog(src, title, detail){
   if (S.log.length > 5000) S.log.shift();
 }
 
-const linkStale = () => S.vent_link.connected && S.t < S.vent_link.staleUntil;
+const linkStale = () => S.vent_link.connected && (LIVE ? !!S.vent_link.liveStale : S.t < S.vent_link.staleUntil);
 const linkOK = () => S.vent_link.connected && !linkStale();
 
 /* ---------------- patient model (simulation only) ---------------- */
@@ -894,9 +894,9 @@ function buildControls(){
     el.querySelector('.dec').addEventListener('click',()=>bump(-1));
     el.querySelector('.inc').addEventListener('click',()=>bump(+1));
     el.querySelector('.cancel').addEventListener('click',()=>{ S.pending[k]=null; render(); });
-    el.querySelector('.apply').addEventListener('click',()=>{ const p=S.pending[k]; if(!p) return; S.pending[k]=null; applyChange(k,p.v,'USER'); evalAlerts(); render(); });
+    el.querySelector('.apply').addEventListener('click',()=>{ const p=S.pending[k]; if(!p) return; S.pending[k]=null; if (LIVE){ send({type:'cmd',name:'set',k,value:p.v}); render(); return; } applyChange(k,p.v,'USER'); evalAlerts(); render(); });
     el.querySelector('.take').addEventListener('click',()=>{ const s=S.suggest[k]; if(s==null) return; S.pending[k]={v:s,at:S.t}; render(); });
-    el.querySelector('.release').addEventListener('click',()=>{ const left=overrideLeft(k); if(left<=0) return; S.override[k]=null;
+    el.querySelector('.release').addEventListener('click',()=>{ if (LIVE){ send({type:'cmd',name:'release',k}); return; } const left=overrideLeft(k); if(left<=0) return; S.override[k]=null;
       const now = S.running && S.mode==='AUTO'; if (now) S.lastDecision = S.t - DECISION_PERIOD;
       addLog('USER', `${P[k].plain} returned to CLOVER`, `Operator cancelled the override lockout with ${mmss(left)} remaining.` + (now ? ' Controller re-evaluates immediately.' : ` Controller is ${S.running?'in MANUAL mode':'disengaged'}; it will resume adjusting ${P[k].plain} when active.`));
       evalAlerts(); render(); });
@@ -935,18 +935,20 @@ function renderTop(){
   setCells($('#clk'), hms(simNow()));
   setCells($('#elapsed'), Math.floor(S.t/3600).toString().padStart(2,'0') + ':' + pad(Math.floor(S.t%3600/60)));
   const nb=$('#nextbox'); nb.classList.toggle('idle', !S.running);
-  setCells($('#next-cd'), S.running ? mmss(Math.max(0, DECISION_PERIOD - (S.t - S.lastDecision))) : '-:--');
+  setCells($('#next-cd'), S.running ? mmss(LIVE ? (S.liveNext==null ? 0 : S.liveNext) : Math.max(0, DECISION_PERIOD - (S.t - S.lastDecision))) : '-:--');
   $('#log-badge').textContent = S.log.length;
-  const leak = 4, vte = Math.round(S.vent.vt*(1-leak/100)/5)*5, mve = S.vent.rr*vte/1000;
+  if (LIVE && S.liveMeasured){ const M=S.liveMeasured, f=(v,d)=> v==null?'—':(typeof v==='number'?(d!=null?v.toFixed(d):String(Math.round(v))):String(v));
+    $('#s-mve').textContent=f(M.mve,1); $('#s-vte').textContent=f(M.vte); $('#s-leak').textContent=f(M.leak); $('#s-ppk').textContent=f(M.ppeak); $('#s-ppl').textContent=f(M.pplat); }
+  else { const leak = 4, vte = Math.round(S.vent.vt*(1-leak/100)/5)*5, mve = S.vent.rr*vte/1000;
   $('#s-mve').textContent = mve.toFixed(1); $('#s-vte').textContent = vte; $('#s-leak').textContent = leak;
-  $('#s-ppk').textContent = Math.round(S.vent.peep + S.vent.vt/28 + 2); $('#s-ppl').textContent = Math.round(S.vent.peep + S.vent.vt/40 + 1);
+  $('#s-ppk').textContent = Math.round(S.vent.peep + S.vent.vt/28 + 2); $('#s-ppl').textContent = Math.round(S.vent.peep + S.vent.vt/40 + 1); }
   const pc=$('#ptcard'), L=S.vent_link;
   const st=(el,cls,txt)=>{ el.className='st '+cls; el.innerHTML=txt; };
   const stale=linkStale(), almWorst = L.alarms.some(a=>a.sev==='crit') ? 'bad' : L.alarms.length ? 'warn' : 'ok';
   st($('#vs-link'), !L.connected?'bad':stale?'warn':'ok', !L.connected ? `LOST ${cellsHTML(mmss(S.t-L.lostAt))}` : stale ? `STALE ${cellsHTML(Math.round(S.t-L.staleAt))} S` : (S.running ? 'CONNECTED · 1 Hz' : 'MONITOR ONLY'));
   st($('#vs-cmd'), L.cmd.status==='rejected'?'bad':L.cmd.status==='pending'?'warn':L.cmd.status==='ack'?'ok':'off', L.cmd.status==='rejected' ? 'REJECTED' : L.cmd.status==='pending' ? 'PENDING' : L.cmd.status==='ack' ? `ACK ${hm(S.startT+L.cmd.t*1000)}` : 'NONE SENT');
   st($('#vs-set'), L.mismatch?'warn':'ok', L.mismatch ? `MISMATCH · ${P[L.mismatch.k].plain}` : 'MATCH');
-  st($('#vs-rem'), L.remote==='local'?'bad':L.remote==='locked'?'warn':(S.running?'ok':'off'), L.remote==='local' ? 'LOCAL OVERRIDE' : L.remote==='locked' ? 'PANEL LOCKED' : (S.running ? 'GRANTED' : 'RELEASED'));
+  st($('#vs-rem'), L.remote==='local'?'bad':L.remote==='locked'?'warn':(!L.remoteReported||!S.running)?'off':'ok', L.remote==='local' ? 'LOCAL OVERRIDE' : L.remote==='locked' ? 'PANEL LOCKED' : !L.remoteReported ? 'NOT REPORTED' : (S.running ? 'GRANTED' : 'RELEASED'));
   st($('#vs-alm'), almWorst, L.alarms.length ? `${L.alarms.length} · ${L.alarms[0].txt}` : 'NONE');
   const worst = (!L.connected || L.cmd.status==='rejected' || L.remote==='local' || almWorst==='bad') ? 'bad' : (stale || L.mismatch || L.remote==='locked' || almWorst==='warn') ? 'warn' : 'ok';
   pc.className = worst==='bad' ? 'is-bad' : worst==='warn' ? 'is-warn' : 'is-conn';
@@ -1065,17 +1067,19 @@ $('#clockbtn').addEventListener('click', ()=>{ TZ = TZ==='utc' ? 'local' : 'utc'
 $('#ie-open').addEventListener('click', ()=>{ if (!S.running) return; S.ieEdit = { idx:S.ie, at:S.t }; render(); });
 $('#ie-tile').querySelector('.ie-edit').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b||!S.ieEdit) return;
   if (b.classList.contains('ie-cancel')){ S.ieEdit=null; }
-  else if (b.classList.contains('ie-apply')){ const from=IE[S.ie]; S.ie=S.ieEdit.idx; S.ieEdit=null; if (IE[S.ie]!==from) addLog('USER', `I:E ${from} → ${IE[S.ie]}`, 'Operator changed the inspiratory:expiratory ratio. This setting is always user-controlled; CLOVER does not adjust it.'); }
+  else if (b.classList.contains('ie-apply')){ if (LIVE){ const idx=S.ieEdit.idx; S.ieEdit=null; send({type:'cmd',name:'ie',idx}); render(); return; } const from=IE[S.ie]; S.ie=S.ieEdit.idx; S.ieEdit=null; if (IE[S.ie]!==from) addLog('USER', `I:E ${from} → ${IE[S.ie]}`, 'Operator changed the inspiratory:expiratory ratio. This setting is always user-controlled; CLOVER does not adjust it.'); }
   else { S.ieEdit.idx = clamp(S.ieEdit.idx + (b.classList.contains('ie-inc')?1:-1), 0, IE.length-1); S.ieEdit.at=S.t; }
   render(); });
 $('#nextbox').addEventListener('click', ()=>{
   if (!S.running) return;
+  if (LIVE){ send({type:'cmd',name:'update'}); return; }
   addLog('USER','Update requested', `Operator tapped UPDATE with ${mmss(Math.max(0, DECISION_PERIOD - (S.t - S.lastDecision)))} left in the cycle.`);
   runController('operator requested an update'); evalAlerts(); render();
 });
 $('#gostop').addEventListener('click', ()=>{
   if (S.gsArm==null){ S.gsArm = performance.now(); render(); return; }
   S.gsArm=null;
+  if (LIVE){ send({type:'cmd',name:'engage',engaged:!S.running}); render(); return; }
   S.running=!S.running; S.runSince=S.t;
   const settings = ['vt','rr','peep','fio2'].map(k=>`${P[k].plain} ${fmtP(k,S.vent[k])}`).join(', ');
   if (S.running){ S.mode='AUTO'; S.modeSince=S.t; ORDER.forEach(k=>{ S.override[k]=null; S.suggest[k]=null; S.pending[k]=null; }); S.lastDecision=S.t-DECISION_PERIOD;
@@ -1089,6 +1093,7 @@ $('#loopbox').addEventListener('click', ()=>{
   if(!S.running) return;
   if (S.modeArm==null){ S.modeArm = performance.now(); render(); return; }
   S.modeArm=null;
+  if (LIVE){ send({type:'cmd',name:'mode',mode: S.mode==='AUTO'?'MANUAL':'AUTO'}); render(); return; }
   S.mode = S.mode==='AUTO'?'MANUAL':'AUTO'; S.modeSince = S.t;
   ORDER.forEach(k=>S.suggest[k]=null);
   if (S.mode==='MANUAL'){ const held = ORDER.filter(k=>overrideLeft(k)>0); ORDER.forEach(k=>S.override[k]=null); if (held.length) addLog('SYS','Overrides cleared', `${held.map(k=>P[k].plain).join(', ')} override${held.length>1?'s':''} ended: in MANUAL the operator holds every setting.`); }
@@ -1102,6 +1107,7 @@ document.querySelectorAll('.vital .tedit').forEach(ed=>{
     if (b.classList.contains('tcancel')){ S.tedit[k]=null; render(); return; }
     if (b.classList.contains('tapply')){
       const from=`${TGT[k][0]}–${TGT[k][1]}`; TGT[k]=[te.lo, te.hi]; S.tedit[k]=null;
+      if (LIVE){ send({type:'cmd',name:'target',k,lo:te.lo,hi:te.hi}); render(); return; }
       addLog('USER', `${k==='spo2'?'SpO₂':'etCO₂'} target ${from} → ${te.lo}–${te.hi} ${L.unit}`, 'Operator changed the target range. Controller evaluates against the new range from its next decision; a value now outside it triggers an immediate decision.');
       evalAlerts(); render(); return; }
     const d = b.classList.contains('tb-inc') ? 1 : -1; te.at=S.t;
@@ -1112,6 +1118,7 @@ document.querySelectorAll('.vital .trendbtn').forEach(b=>b.addEventListener('cli
 document.querySelectorAll('.vital .win').forEach(w=>w.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.trend[w.dataset.k].win=+b.dataset.w; render(); }));
 $('#o2btn').addEventListener('click',()=>{ if (S.vent.fio2 >= 1.0 - 1e-9) return; S.o2arm = (S.o2arm!=null) ? null : performance.now(); render(); });
 $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2arm=null; S.pending.fio2=null;
+  if (LIVE){ send({type:'cmd',name:'o2_emergency'}); render(); return; }
   if (!S.vent_link.connected){ addLog('USER','Emergency O₂ refused — ventilator link lost','FiO₂ 100% confirmed but no link to the ventilator; nothing sent.'); render(); return; }
   if (!S.running){ addLog('USER','Emergency O₂ refused — CLOVER disengaged','Set FiO₂ on the ventilator itself.'); render(); return; }
   applyChange('fio2', 1.0, 'USER', `EMERGENCY O₂: operator set FiO₂ to 100% from the SpO₂ tile (SpO₂ ${S.patient.signal?S.shown.spo2+'%':'no signal'}). Controller will not lower FiO₂ for ${S.cfg.overrideMin} min unless released.`);
@@ -1119,7 +1126,7 @@ $('#o2confirm').addEventListener('click',()=>{ if (S.o2arm==null) return; S.o2ar
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ $('#'+b.dataset.close).classList.remove('open'); if (b.dataset.close==='adv-ovl') S.cfgEdit=null; render(); }));
 $('#dispbtn').addEventListener('click',()=>{ $('#disp-ovl').classList.add('open'); addLog('USER','Opened advanced display',''); });
 $('#cfg-ovr').addEventListener('click', e=>{ const b=e.target.closest('button'); if(!b) return;
-  if (b.classList.contains('cfg-apply')){ const from=S.cfg.overrideMin; S.cfg.overrideMin=S.cfgEdit; S.cfgEdit=null; addLog('USER', `SETUP: override lockout ${from} → ${S.cfg.overrideMin} min`, 'Applies to overrides started from now on.'); render(); return; }
+  if (b.classList.contains('cfg-apply')){ if (LIVE){ const v=S.cfgEdit; S.cfgEdit=null; send({type:'cmd',name:'cfg',overrideMin:v}); render(); return; } const from=S.cfg.overrideMin; S.cfg.overrideMin=S.cfgEdit; S.cfgEdit=null; addLog('USER', `SETUP: override lockout ${from} → ${S.cfg.overrideMin} min`, 'Applies to overrides started from now on.'); render(); return; }
   const cur = S.cfgEdit!=null ? S.cfgEdit : S.cfg.overrideMin; S.cfgEdit = clamp(cur + (b.classList.contains('cfg-inc')?1:-1), 1, 30); render(); });
 $('#advbtn').addEventListener('click',()=>{ $('#adv-ovl').classList.add('open'); addLog('USER','Opened SETUP',''); });
 $('#logbtn').addEventListener('click',()=>{ $('#log-ovl').classList.add('open'); renderLog(); });
@@ -1129,6 +1136,7 @@ $('#lightbtn').addEventListener('click',()=>{ S.lightMode=(S.lightMode+1)%3; doc
 $('#simbtn').addEventListener('click',()=>$('#sim').classList.toggle('open'));
 $('#sim').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return;
   if(b.dataset.speed){ S.speed=+b.dataset.speed; $('#sim').querySelectorAll('[data-speed]').forEach(x=>x.classList.toggle('on',x===b)); return; }
+  if (LIVE){ send({type:'scenario',name:b.dataset.sim}); $('#sim').classList.remove('open'); return; }
   const p=S.patient;
   if(b.dataset.sim==='injury'){ p.shunt=0.45; addLog('SYS','[sim] Lung injury','Shunt fraction → 0.45'); }
   if(b.dataset.sim==='hypo'){ p.vco2=300; addLog('SYS','[sim] CO₂ production up','VCO₂ factor → 300'); }
@@ -1172,7 +1180,7 @@ function drawWaves(now){
     const tile = $('#v-'+k); if (tile.classList.contains('trending') || tile.classList.contains('editing')) continue;
     const x0 = k==='etco2' ? 52 : 0, PW = w.W - x0;
     const nx = w.x + dt*WAVE.sweep;
-    for (let i=Math.floor(w.x); i<nx; i++){ const xi = x0 + (((i % PW) + PW) % PW); w.cols[xi] = waveSample(k, now/1000 - (nx - i)/WAVE.sweep); }
+    for (let i=Math.floor(w.x); i<nx; i++){ const xi = x0 + (((i % PW) + PW) % PW); w.cols[xi] = LIVE ? liveWaveSample(k) : waveSample(k, now/1000 - (nx - i)/WAVE.sweep); }
     w.x = nx % PW;
     const ctx=w.ctx, W=w.W, H=w.H, x=x0+Math.floor(w.x);
     ctx.clearRect(0,0,W,H);
@@ -1201,6 +1209,56 @@ function drawWaves(now){
 let waveLast = 0;
 function waveLoop(now){ if (now - waveLast >= 33){ waveLast = now; drawWaves(now); } requestAnimationFrame(waveLoop); }
 
+/* ---------------- live source: the CLOVER bridge over WebSocket (?ws=ws://host:port) ---------------- */
+const LIVE = new URLSearchParams(location.search).get('ws');
+let ws = null, wsUp = false, wsTimer = null;
+S.wq = { spo2:[], etco2:[] }; S.wrate = { spo2:25, etco2:25 }; S.liveNext = null; S.liveMeasured = null; S.vent_link.liveStale = false; S.vent_link.remoteReported = true;
+function send(o){ if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+function applyFrame(m){
+  S.t = m.t;
+  if (m.spo2 != null) S.f.spo2 = m.spo2;  if (m.etco2 != null) S.f.etco2 = m.etco2;
+  S.patient.signal = m.shown && m.shown.spo2 != null;
+  if (m.shown){ if (m.shown.spo2 != null) S.shown.spo2 = m.shown.spo2; if (m.shown.etco2 != null) S.shown.etco2 = m.shown.etco2; }
+  if (m.vent){ ORDER.forEach(k => { if (m.vent[k] != null) S.vent[k] = m.vent[k]; });
+    if (m.vent.ie != null){ const i = [1,1.5,2,2.5,3,4].indexOf(m.vent.ie); if (i>=0) S.ie = i; } }
+  S.mode = m.mode; S.running = !!m.engaged; S.modeSince = m.modeSince||0; S.runSince = m.runSince||0;
+  ORDER.forEach(k => { S.override[k] = (m.overrides && m.overrides[k] != null) ? { until:m.overrides[k] } : null; S.suggest[k] = (m.suggest && m.suggest[k] != null) ? m.suggest[k] : null;
+    if (m.setBy && m.setBy[k]) S.setBy[k] = m.setBy[k]; });
+  if (m.targets){ TGT.spo2 = m.targets.spo2.slice(); TGT.etco2 = m.targets.etco2.slice(); }
+  if (m.cfg && m.cfg.overrideMin != null) S.cfg.overrideMin = m.cfg.overrideMin;
+  const L = S.vent_link, ml = m.link || {};
+  if (L.connected && !ml.connected) L.lostAt = S.t - (ml.lastFrameAge||0);
+  L.connected = !!ml.connected; L.liveStale = !!ml.stale; L.staleAt = ml.stale ? S.t - (ml.lastFrameAge||0) : 0;
+  L.cmd = ml.cmd || {status:'none'}; L.remote = ml.remote == null ? 'granted' : ml.remote; L.remoteReported = ml.remote != null;
+  L.mismatch = ml.mismatch || null; L.alarms = (ml.alarms||[]).map(a => ({ id:a.id, txt:a.txt, sev:a.sev, until:Infinity }));
+  S.liveMeasured = m.measured || null; S.liveNext = m.nextDecisionIn;
+  S.hist.push({ t:S.t, spo2: S.patient.signal ? m.spo2 : null, etco2: m.etco2 }); if (S.hist.length > 3700) S.hist.shift();
+}
+function connectLive(){
+  try { ws = new WebSocket(LIVE); } catch(e){ scheduleReconnect(); return; }
+  ws.onopen = () => { wsUp = true; };
+  ws.onclose = () => { wsUp = false; S.vent_link.connected = false; S.vent_link.lostAt = S.t; render(); scheduleReconnect(); };
+  ws.onerror = () => {};
+  ws.onmessage = ev => {
+    let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
+    if (m.type === 'snapshot'){
+      S.startT = m.startT; S.hist = (m.hist||[]).map(h => ({ t:h.t, spo2:h.spo2, etco2:h.etco2 })); S.log = (m.log||[]).map(e => ({ t:e.t, src:e.src, title:e.title, detail:e.detail||'' }));
+      if (m.identity){ $('#ptcard .model').textContent = `${m.identity.make} ${m.identity.model}`.trim(); }
+      applyFrame(m); render();
+    } else if (m.type === 'frame'){ applyFrame(m); render(); }
+    else if (m.type === 'log'){ S.log.push({ t:m.entry.t, src:m.entry.src, title:m.entry.title, detail:m.entry.detail||'' }); }
+    else if (m.type === 'wave'){ const q = S.wq[m.k]; if (!q) return; S.wrate[m.k] = m.rate || 25; const scale = m.k==='etco2' ? 1/70 : 1;
+      for (const v of m.samples) q.push(v==null ? NaN : v*scale); const max = Math.round(S.wrate[m.k]*3); if (q.length > max) q.splice(0, q.length-max); }
+  };
+}
+function scheduleReconnect(){ clearTimeout(wsTimer); wsTimer = setTimeout(connectLive, 2000); }
+function liveWaveSample(k){
+  const q = S.wq[k], per = Math.max(1, Math.round(S.wrate[k] / WAVE.sweep * 2));
+  if (q.length < per) return NaN;
+  let sum = 0, n = 0; for (let i=0;i<per;i++){ const v = q.shift(); if (!Number.isNaN(v)){ sum += v; n++; } }
+  return n ? sum/n : NaN;
+}
+
 /* ---------------- scaling & loop ---------------- */
 let scale=1;
 function fit(){ const vw=innerWidth, vh=innerHeight; scale=Math.min(vw/1280, vh/990); $('#stage').style.transform=`scale(${scale})`; }
@@ -1209,7 +1267,7 @@ fit();
 
 buildControls();
 initWaves();
-preseed();
+if (LIVE){ S.startT = Date.now(); S.hist=[]; S.log=[]; S.vent_link.connected=false; addLog('SYS','Waiting for CLOVER bridge', LIVE); $('#ptcard .lab').textContent = 'Ventilator · LIVE'; connectLive(); } else preseed();
 render();
 requestAnimationFrame(waveLoop);
 
@@ -1217,6 +1275,7 @@ let acc=0, lastReal=performance.now();
 setInterval(()=>{
   const now=performance.now(); acc += (now-lastReal)/1000*S.speed; lastReal=now;
   let n=Math.min(600, Math.floor(acc)); acc-=n;
+  if (LIVE){ if (n>0){ ['spo2','etco2'].forEach(k => { const e=S.tedit[k]; if (e && S.t - e.at > TEDIT_TIMEOUT) S.tedit[k]=null; }); ORDER.forEach(k => { const p=S.pending[k]; if (p && S.t - p.at > PENDING_TIMEOUT) S.pending[k]=null; }); if (S.ieEdit && S.t - S.ieEdit.at > PENDING_TIMEOUT) S.ieEdit=null; evalAlerts(); } n=0; }
   while(n-- > 0) tick();
   if (S.gsArm!=null && now - S.gsArm > 5000){ S.gsArm=null; addLog('SYS', (S.running?'DISENGAGE':'ENGAGE')+' not confirmed', 'Button armed but not tapped again within 5 s; no change made.'); }
   if (S.modeArm!=null && (now - S.modeArm > 5000 || !S.running)){ S.modeArm=null; if (S.running) addLog('SYS','Mode change not confirmed','Button armed but not tapped again within 5 s; mode unchanged.'); }

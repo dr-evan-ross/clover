@@ -208,7 +208,8 @@ is applied to the arrows only; the slash never rotates.
 - Provider / RT screen (denser: waveforms or trends visible by default, more numbers,
   reasoning inline).
 - Custom layout mode (choose which tiles show, within the same fixed grid).
-- Interface contract for the real controller's data and decision stream, replacing the
-  simulator.
-- Replace the Zoll 731 EMV+ placeholder with the actual target ventilator.
+- ~~Interface contract~~ done: `bridge/CONTRACT.md`, with a Python bridge and stub adapter.
+  Remaining: the vendor adapter (private), bench run in MANUAL, then AUTO on a test lung.
+- The ventilator card's identity comes from the adapter in live mode; the Zoll 731 EMV+
+  text is only the simulator's placeholder.
 - A signal-quality index beside each waveform, so "janky" is not left to judgment.

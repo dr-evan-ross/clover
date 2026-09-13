@@ -18,6 +18,17 @@ on request, everything logged with reasoning, one strict grid.
   demo is self-running. The dashed SIM button (bottom-left card) is demo scaffolding only.
 - `gui/DESIGN.md` — design rules, palette, layout numbers, vocabulary, controller
   interaction rules, and what's not yet built.
+- `bridge/` — Python bridge between the GUI (WebSocket) and a ventilator (serial): the
+  `VentAdapter` interface, a stub ventilator, the controller, session/authority model, and
+  the log of record. `bridge/CONTRACT.md` is the interface spec. Tests are stdlib-only:
+  `python3 -m unittest discover -s bridge/tests`. The vendor adapter is private and lives
+  outside this repo.
+
+## Live mode
+
+Open the GUI with `?ws=ws://host:port` to drive it from the bridge instead of the built-in
+simulator. In live mode the GUI never applies a command locally; it sends it and renders
+the next frame. Keep that rule when adding controls.
 
 ## Working conventions
 
