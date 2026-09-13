@@ -17,7 +17,9 @@ def _pulse_importable() -> bool:
     if not os.path.isdir(py):
         return False
     try:
-        sys.path.insert(0, py)
+        sys.path.insert(0, DEFAULT_ROOT)
+        from common import pulse_env      # same bootstrap the adapter uses (paths, no chdir)
+        pulse_env.bootstrap(chdir=False)
         import pulse.engine.PulseEngine  # noqa: F401
         return True
     except Exception:
