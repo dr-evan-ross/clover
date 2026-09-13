@@ -11,10 +11,23 @@ import unittest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from clover_bridge.pulse_adapter import DEFAULT_ROOT  # noqa: E402
 
-HAVE_PULSE = os.path.isdir(os.path.join(DEFAULT_ROOT, "pulse_engine", "python"))
+def _pulse_importable() -> bool:
+    """Pulse bindings need the vent_optimizer venv (numpy, pandas, protobuf); skip elsewhere."""
+    py = os.path.join(DEFAULT_ROOT, "pulse_engine", "python")
+    if not os.path.isdir(py):
+        return False
+    try:
+        sys.path.insert(0, py)
+        import pulse.engine.PulseEngine  # noqa: F401
+        return True
+    except Exception:
+        return False
 
 
-@unittest.skipUnless(HAVE_PULSE, "vent_optimizer/pulse_engine not found")
+HAVE_PULSE = _pulse_importable()
+
+
+@unittest.skipUnless(HAVE_PULSE, "Pulse bindings not importable here; run under vent_optimizer/.venv")
 class PulseAdapterTests(unittest.TestCase):
     def test_frames_waves_write_and_disturbance(self):
         asyncio.run(self._run())
