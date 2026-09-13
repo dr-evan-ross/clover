@@ -350,6 +350,8 @@ class Session:
             "overrides": {k: round(u, 1) for k, u in self.overrides.items()},
             "suggest": self.suggest, "setBy": self.set_by, "targets": self.targets, "cfg": self.cfg,
             "link": self.link_json(),
+            "identity": None if self.identity is None else {"make": self.identity.make, "model": self.identity.model, "serial": self.identity.serial,
+                                                            "transport": self.identity.transport, "firmware": self.identity.firmware, "extra": self.identity.extra},
             "nextDecisionIn": max(0.0, DECISION_PERIOD - (self.t - self.last_decision)) if self.engaged else None,
         }
 

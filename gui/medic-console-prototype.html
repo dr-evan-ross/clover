@@ -454,7 +454,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
       <section id="ptcard" class="is-conn">
         <span class="lab">Ventilator</span>
         <div class="conn"><span class="dot"></span><span class="word">CONNECTED</span></div>
-        <div class="model">ZOLL 731 EMV+</div>
+        <div class="model" id="vent-model">ZOLL 731 EMV+ · simulated</div>
         <div class="srows">
           <div class="srow"><span>Link</span><b class="st" id="vs-link"></b></div>
           <div class="srow"><span>Commands</span><b class="st" id="vs-cmd"></b></div>
@@ -462,7 +462,7 @@ body.light-red #stage{filter:saturate(.2) brightness(.85)}
           <div class="srow"><span>Remote control</span><b class="st" id="vs-rem"></b></div>
           <div class="srow"><span>Vent alarms</span><b class="st" id="vs-alm"></b></div>
         </div>
-        <div class="vfoot"><span>Batt <b>84%</b> · 2 h 10 m · O₂ <b>1,640 psi</b></span><span>SN 731-04182 · AC (V)</span><span>Mode since <b id="vent-since">—</b></span></div>
+        <div class="vfoot"><span id="vent-power">Batt <b>84%</b> · O₂ <b>1,640 psi</b></span><span id="vent-id">SN SIM-0001 · VC-CMV</span><span>Mode since <b id="vent-since">—</b></span></div>
         <button id="simbtn">SIM · DEMO SCENARIOS</button>
       </section>
       <button id="advbtn"><span class="word">SETUP</span></button>
@@ -1239,6 +1239,11 @@ function applyFrame(m){
   L.cmd = ml.cmd || {status:'none'}; L.remote = ml.remote == null ? 'granted' : ml.remote; L.remoteReported = ml.remote != null;
   L.mismatch = ml.mismatch || null; L.alarms = (ml.alarms||[]).map(a => ({ id:a.id, txt:a.txt, sev:a.sev, until:Infinity }));
   S.liveMeasured = m.measured || null; S.liveNext = m.nextDecisionIn;
+  if (m.identity){ const id = m.identity, ex = id.extra || {};
+    $('#vent-model').textContent = `${id.make} ${id.model}`.trim();
+    $('#vent-id').textContent = `SN ${id.serial}` + (ex.vc_mode ? ` · VC-${ex.vc_mode}` : '') + (id.transport ? ` · ${id.transport}` : '');
+    const M = m.measured || {}, batt = M.battery_pct, o2 = M.o2_supply_psi;
+    $('#vent-power').innerHTML = (batt != null ? `Batt <b>${Math.round(batt)}%</b>` : 'Batt <b>—</b>') + (o2 != null ? ` · O₂ <b>${Math.round(o2).toLocaleString()} psi</b>` : ' · O₂ <b>—</b>'); }
   S.hist.push({ t:S.t, spo2: S.patient.signal ? m.spo2 : null, etco2: m.etco2 }); if (S.hist.length > 3700) S.hist.shift();
 }
 function connectLive(){
@@ -1250,7 +1255,6 @@ function connectLive(){
     let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
     if (m.type === 'snapshot'){
       S.startT = m.startT; S.hist = (m.hist||[]).map(h => ({ t:h.t, spo2:h.spo2, etco2:h.etco2 })); S.log = (m.log||[]).map(e => ({ t:e.t, src:e.src, title:e.title, detail:e.detail||'' }));
-      if (m.identity){ $('#ptcard .model').textContent = `${m.identity.make} ${m.identity.model}`.trim(); }
       applyFrame(m); render();
     } else if (m.type === 'frame'){ applyFrame(m); render(); }
     else if (m.type === 'log'){ S.log.push({ t:m.entry.t, src:m.entry.src, title:m.entry.title, detail:m.entry.detail||'' }); }
