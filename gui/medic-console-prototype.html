@@ -1216,7 +1216,7 @@ let waveLast = 0;
 function waveLoop(now){ if (now - waveLast >= 33){ waveLast = now; drawWaves(now); } requestAnimationFrame(waveLoop); }
 
 /* ---------------- live source: the CLOVER bridge over WebSocket (?ws=ws://host:port) ---------------- */
-const LIVE = new URLSearchParams(location.search).get('ws');
+let LIVE = new URLSearchParams(location.search).get('ws');
 let ws = null, wsUp = false, wsTimer = null;
 S.wq = { spo2:[], etco2:[] }; S.wrate = { spo2:25, etco2:25 }; S.liveNext = null; S.liveMeasured = null; S.vent_link.liveStale = false; S.vent_link.remoteReported = true;
 function send(o){ if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
@@ -1273,7 +1273,10 @@ fit();
 
 buildControls();
 initWaves();
-if (LIVE){ S.startT = Date.now(); S.hist=[]; S.log=[]; S.vent_link.connected=false; addLog('SYS','Waiting for CLOVER bridge', LIVE); $('#ptcard .lab').textContent = 'Ventilator · LIVE'; connectLive(); } else preseed();
+function goLive(){ S.startT = Date.now(); S.hist=[]; S.log=[]; S.vent_link.connected=false; addLog('SYS','Waiting for CLOVER bridge', LIVE); $('#ptcard .lab').textContent = 'Ventilator · LIVE'; connectLive(); render(); }
+if (LIVE) goLive();
+else if (location.protocol.startsWith('http')) { preseed(); fetch('/config.json').then(r => r.json()).then(c => { if (c && c.ws){ LIVE = c.ws; goLive(); } }).catch(()=>{}); }
+else preseed();
 render();
 requestAnimationFrame(waveLoop);
 

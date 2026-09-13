@@ -73,7 +73,7 @@ class StubVent(VentAdapter):
         return CommandResult("ack", "", readback=self.settings[key])
 
     # ---- scenario hooks (not part of the interface) ----
-    def scenario(self, name: str, seconds: float | None = None) -> None:
+    def scenario(self, name: str, seconds: float | None = None, params: dict | None = None) -> None:
         p = self.patient
         if name == "injury":
             p["shunt"] = 0.45

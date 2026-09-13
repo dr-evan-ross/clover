@@ -76,6 +76,13 @@ class PulseVent(VentAdapter):
         self.events: list[dict] = []
 
     # ------------------------------------------------------------------ VentAdapter
+    @staticmethod
+    def list_patients(root: str | None = None) -> list[str]:
+        d = os.path.join(root or DEFAULT_ROOT, "pulse_engine", "bin", "states")
+        if not os.path.isdir(d):
+            return []
+        return sorted(f.replace("@0s.json", "") for f in os.listdir(d) if f.endswith("@0s.json"))
+
     async def start(self) -> Identity:
         if self.root not in sys.path:
             sys.path.insert(0, self.root)
@@ -153,29 +160,37 @@ class PulseVent(VentAdapter):
         return CommandResult("ack", "", readback=self.settings[key])
 
     # ------------------------------------------------------------------ scenarios (demo only)
-    def scenario(self, name: str, seconds: float | None = None) -> None:
+    def scenario(self, name: str, seconds: float | None = None, params: dict | None = None) -> None:
+        """Demo disturbances. ``params`` (from the control page) override the defaults."""
         from scenario_runner.actions import apply_event, Synth
+        p = dict(params or {})
+        sev = float(p.get("severity", 0.6))
+        side = p.get("side", "Left")
         ev = None
-        if name == "injury":          ev = Synth("ards", {"severity": 0.6})
+        if name == "injury":          ev = Synth("ards", {"severity": sev, "left": float(p.get("left", sev)), "right": float(p.get("right", sev))})
         elif name == "recover":       ev = Synth("ards", {"severity": 0.0})
-        elif name == "hypo":          ev = Synth("exercise", {"intensity": 0.35})   # Pulse's VCO2 knob
-        elif name == "hemorrhage":    ev = Synth("hemorrhage", {"compartment": "RightLeg", "rate_mL_per_min": 250.0})
-        elif name == "stop_bleed":    ev = Synth("hemorrhage", {"compartment": "RightLeg", "rate_mL_per_min": 0.0})
-        elif name == "obstruction":   ev = Synth("airway_obstruction", {"severity": 0.6})
-        elif name == "pneumo":        ev = Synth("tension_pneumothorax", {"side": "Left", "severity": 0.7})
-        elif name == "decompress":    ev = Synth("needle_decompression", {"side": "Left", "state": "on"})
-        elif name == "dropout":       self.probe_off_until = self.t + (seconds or 40)
-        elif name == "stale":         self.stale_until = self.t + (seconds or 15)
+        elif name == "hypo":          ev = Synth("exercise", {"intensity": float(p.get("intensity", 0.35))})   # Pulse's VCO2 knob
+        elif name == "hemorrhage":    ev = Synth("hemorrhage", {"compartment": p.get("compartment", "RightLeg"), "rate_mL_per_min": float(p.get("rate", 250.0))})
+        elif name == "stop_bleed":    ev = Synth("hemorrhage", {"compartment": p.get("compartment", "RightLeg"), "rate_mL_per_min": 0.0})
+        elif name == "obstruction":   ev = Synth("airway_obstruction", {"severity": sev})
+        elif name == "pneumo":        ev = Synth("tension_pneumothorax", {"side": side, "severity": float(p.get("severity", 0.7))})
+        elif name == "decompress":    ev = Synth("needle_decompression", {"side": side, "state": "on"})
+        elif name == "shunt":         ev = Synth("pulmonary_shunt", {"severity": sev})
+        elif name == "fluids":        ev = Synth("fluid_infusion", {"compound": p.get("compound", "Saline"), "rate_mL_per_min": float(p.get("rate", 100.0)), "bag_volume_mL": float(p.get("volume", 1000.0))})
+        elif name == "dropout":       self.probe_off_until = self.t + (seconds or float(p.get("seconds", 40)))
+        elif name == "stale":         self.stale_until = self.t + (seconds or float(p.get("seconds", 15)))
         elif name == "reject":        self.reject_next = True
         elif name == "panel":
-            self.settings["vt"] = 550.0; self._apply_vent()
+            k = p.get("key", "vt"); val = float(p.get("value", 550.0))
+            if k in self.settings:
+                self.settings[k] = val; self._apply_vent()
             self.remote, self._remote_until = "local", self.t + 20
-        elif name == "alarm":         self.extra_alarms.append((Alarm("sim", "HIGH PRESSURE", "crit"), self.t + (seconds or 30)))
+        elif name == "alarm":         self.extra_alarms.append((Alarm("sim", str(p.get("text", "HIGH PRESSURE")), p.get("sev", "crit")), self.t + (seconds or float(p.get("seconds", 30)))))
         else:
             raise ValueError(f"unknown scenario {name!r}")
         if ev is not None:
             apply_event(self.eng, self.m, ev)
-        self.events.append({"t": round(self.t, 1), "scenario": name})
+        self.events.append({"t": round(self.t, 1), "scenario": name, "params": p})
 
     # ------------------------------------------------------------------ engine
     def _apply_vent(self) -> None:

@@ -25,6 +25,12 @@ on request, everything logged with reasoning, one strict grid.
   outside this repo. `pulse_adapter.py` runs the Pulse Physiology Engine (from the sibling
   `../vent_optimizer` project, use its `.venv`) as patient and ventilator for demos.
 
+## Demo launcher
+
+`python3 start_clover.py` starts the bridge with a web UI: `/` is the Pulse control page
+(`bridge/control.html`), `/clover` is the medic display. The GUI discovers the WebSocket from
+`/config.json` when served this way.
+
 ## Live mode
 
 Open the GUI with `?ws=ws://host:port` to drive it from the bridge instead of the built-in

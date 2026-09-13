@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CLOVER Pulse Control</title>
+<style>
+:root{--g0:#080b07;--g1:#0f140d;--g2:#161d13;--g3:#1f281b;--g4:#2a3625;--line:#2a3625;--line2:#3a4834;
+  --ink:#d3dac6;--ink2:#8d9a7e;--ink3:#5b6850;--go:#5f9e3b;--warn:#d5a02c;--warn-ink:#1a1204;--crit:#d84b38;--spo2:#7fc4e6;--etco2:#f0dc7a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--g0);color:var(--ink);font:14px/1.4 "Barlow","Helvetica Neue",Arial,sans-serif;padding:18px}
+h1{font-size:22px;letter-spacing:.14em;margin:0 0 4px;font-weight:700}
+.sub{color:var(--ink2);font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:340px 1fr 360px;gap:14px;align-items:start}
+.card{background:var(--g1);border:2px solid var(--line);padding:14px 16px}
+.card h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);margin:0 0 12px;font-weight:600}
+label{display:block;font-size:12px;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;margin:10px 0 4px}
+select,input[type=number]{width:100%;background:var(--g2);color:var(--ink);border:1px solid var(--line2);padding:8px 10px;font:inherit;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+button{font:inherit;color:var(--ink);background:var(--g2);border:1px solid var(--line2);padding:10px 12px;cursor:pointer;letter-spacing:.08em;font-weight:600;text-align:left}
+button:hover{background:var(--g3)}
+button:disabled{opacity:.35;cursor:default}
+.big{width:100%;padding:14px;text-align:center;font-size:16px;letter-spacing:.14em}
+.start{background:#2f5a1f;border-color:var(--go)}
+.stop{background:#6e2a1e;border-color:var(--crit)}
+.open{background:#13202b;border-color:#3d7ea3;color:#a8dcf5}
+.scen{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:6px 0}
+.scen .p{display:flex;gap:6px;align-items:center;color:var(--ink2);font-size:12px}
+.scen .p input,.scen .p select{width:82px;padding:6px 8px}
+.scen button{width:100%}
+.stat{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-variant-numeric:tabular-nums}
+.stat dt{color:var(--ink2);margin:0}
+.stat dd{margin:0;font-weight:600}
+.pill{display:inline-block;padding:2px 8px;font-size:11px;letter-spacing:.12em;font-weight:700}
+.pill.ok{background:#245a1a;color:#d4f2c0}.pill.warn{background:#7a5f14;color:#fff0c2}.pill.bad{background:#8a2a1c;color:#ffe3dc}.pill.off{background:var(--g4);color:var(--ink2)}
+.vals{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.val{background:var(--g2);border:1px solid var(--line);padding:8px 12px}
+.val b{display:block;font-size:34px;line-height:1;font-weight:700}
+.val.spo2 b{color:var(--spo2)}.val.etco2 b{color:var(--etco2)}
+.val span{font-size:11px;letter-spacing:.12em;color:var(--ink2);text-transform:uppercase}
+ul.ev{list-style:none;margin:8px 0 0;padding:0;max-height:220px;overflow:auto;font-size:12px}
+ul.ev li{border-top:1px solid var(--line);padding:5px 0;color:var(--ink2)}
+ul.ev li b{color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;margin-right:8px}
+.err{color:#ff9b8c;margin-top:8px;min-height:18px}
+.note{color:var(--ink3);font-size:12px;margin-top:10px}
+</style>
+</head>
+<body>
+<h1>CLOVER · PULSE CONTROL</h1>
+<div class="sub">Patient and ventilator simulated by the Pulse Physiology Engine · CLOVER display opens separately</div>
+
+<div class="grid">
+  <section class="card" id="setup">
+    <h2>Session</h2>
+    <label>Patient</label>
+    <select id="patient"></select>
+    <label>Speed <span id="speedv">1×</span> real time</label>
+    <input type="range" id="speed" min="1" max="30" step="1" value="1">
+    <label>Initial ventilator settings</label>
+    <div class="row4">
+      <div><label style="margin-top:0">VT mL</label><input type="number" id="vt" value="500" step="25"></div>
+      <div><label style="margin-top:0">RR /min</label><input type="number" id="rr" value="14" step="1"></div>
+      <div><label style="margin-top:0">PEEP</label><input type="number" id="peep" value="5" step="1"></div>
+      <div><label style="margin-top:0">FiO₂ %</label><input type="number" id="fio2" value="40" step="5"></div>
+    </div>
+    <div style="height:14px"></div>
+    <button class="big start" id="start">START SESSION</button>
+    <div style="height:8px"></div>
+    <button class="big stop" id="stop" disabled>STOP SESSION</button>
+    <div style="height:14px"></div>
+    <button class="big open" id="open">OPEN CLOVER DISPLAY ▸</button>
+    <div class="err" id="err"></div>
+    <div class="note">Starting a session replaces the current one. The CLOVER display shows LINK LOST while nothing is running, and reconnects on its own.</div>
+  </section>
+
+  <section class="card">
+    <h2>Scenarios · inject into the running patient</h2>
+    <div class="scen"><button data-s="injury">Lung injury (ARDS)</button><div class="p">severity <input type="number" id="p-injury" value="0.6" step="0.1" min="0" max="1"></div></div>
+    <div class="scen"><button data-s="recover">Lung recovery (ARDS → 0)</button><div class="p"></div></div>
+    <div class="scen"><button data-s="hypo">↑ CO₂ production</button><div class="p">intensity <input type="number" id="p-hypo" value="0.35" step="0.05" min="0" max="1"></div></div>
+    <div class="scen"><button data-s="shunt">Pulmonary shunt</button><div class="p">severity <input type="number" id="p-shunt" value="0.5" step="0.1" min="0" max="1"></div></div>
+    <div class="scen"><button data-s="obstruction">Airway obstruction</button><div class="p">severity <input type="number" id="p-obstruction" value="0.6" step="0.1" min="0" max="1"></div></div>
+    <div class="scen"><button data-s="pneumo">Tension pneumothorax</button><div class="p"><select id="p-pneumo-side"><option>Left</option><option>Right</option></select> <input type="number" id="p-pneumo" value="0.7" step="0.1" min="0" max="1"></div></div>
+    <div class="scen"><button data-s="decompress">Needle decompression</button><div class="p"><select id="p-decompress-side"><option>Left</option><option>Right</option></select></div></div>
+    <div class="scen"><button data-s="hemorrhage">Hemorrhage</button><div class="p"><select id="p-hemo-comp"><option>RightLeg</option><option>LeftLeg</option><option>RightArm</option><option>LeftArm</option><option>Aorta</option><option>VenaCava</option></select> <input type="number" id="p-hemorrhage" value="250" step="50" min="0"> mL/min</div></div>
+    <div class="scen"><button data-s="stop_bleed">Stop bleeding</button><div class="p"></div></div>
+    <div class="scen"><button data-s="fluids">Fluid bolus (saline)</button><div class="p"><input type="number" id="p-fluids" value="1000" step="250" min="0"> mL @ <input type="number" id="p-fluids-rate" value="100" step="50"> mL/min</div></div>
+    <h2 style="margin-top:18px">Device and signal faults</h2>
+    <div class="scen"><button data-s="dropout">SpO₂ probe off</button><div class="p"><input type="number" id="p-dropout" value="40" step="10"> s</div></div>
+    <div class="scen"><button data-s="stale">Data stream stalls</button><div class="p"><input type="number" id="p-stale" value="15" step="5"> s</div></div>
+    <div class="scen"><button data-s="reject">Vent rejects next command</button><div class="p"></div></div>
+    <div class="scen"><button data-s="panel">Someone changes the vent panel</button><div class="p"><select id="p-panel-key"><option value="vt">VT</option><option value="rr">RR</option><option value="peep">PEEP</option><option value="fio2">FiO₂</option></select> <input type="number" id="p-panel" value="550" step="1"></div></div>
+    <div class="scen"><button data-s="alarm">Vent alarm</button><div class="p"><select id="p-alarm-text"><option>HIGH PRESSURE</option><option>LOW O₂ SUPPLY</option><option>CIRCUIT DISCONNECT</option><option>APNEA</option></select></div></div>
+  </section>
+
+  <section class="card">
+    <h2>Status</h2>
+    <dl class="stat">
+      <dt>Bridge</dt><dd id="s-bridge"><span class="pill off">CONNECTING</span></dd>
+      <dt>Session</dt><dd id="s-session">—</dd>
+      <dt>Patient</dt><dd id="s-patient">—</dd>
+      <dt>Sim time</dt><dd id="s-t">—</dd>
+      <dt>Speed</dt><dd id="s-speed">—</dd>
+      <dt>Mode</dt><dd id="s-mode">—</dd>
+      <dt>Link</dt><dd id="s-link">—</dd>
+    </dl>
+    <div class="vals">
+      <div class="val spo2"><span>SpO₂ %</span><b id="v-spo2">--</b></div>
+      <div class="val etco2"><span>etCO₂ mmHg</span><b id="v-etco2">--</b></div>
+    </div>
+    <dl class="stat">
+      <dt>VT</dt><dd id="v-vt">—</dd><dt>RR</dt><dd id="v-rr">—</dd><dt>PEEP</dt><dd id="v-peep">—</dd><dt>FiO₂</dt><dd id="v-fio2">—</dd>
+    </dl>
+    <h2 style="margin-top:16px">Injected</h2>
+    <ul class="ev" id="events"></ul>
+  </section>
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+let ws = null, WS = null, st = null;
+const mmss = s => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
+function send(o){ if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+function pill(cls, txt){ return `<span class="pill ${cls}">${txt}</span>`; }
+
+function render(){
+  if (!st) return;
+  const sel = $('#patient');
+  if (sel.options.length === 0 && st.patients && st.patients.length){
+    st.patients.forEach(p => { const o = document.createElement('option'); o.value = o.textContent = p; sel.appendChild(o); });
+    const def = [...sel.options].find(o => o.value === 'DefaultMale'); if (def) def.selected = true;
+  }
+  $('#start').disabled = false; $('#stop').disabled = !st.running;
+  $('#s-session').innerHTML = st.running ? pill('ok','RUNNING') : pill('off','STOPPED');
+  $('#s-patient').textContent = st.identity ? st.identity.model : '—';
+  $('#s-t').textContent = mmss(st.t);
+  $('#s-speed').textContent = st.running ? `${st.speed}× set · ${st.achieved}× achieved` : '—';
+  $('#s-mode').innerHTML = !st.engaged ? pill('bad','DISENGAGED') : st.mode === 'AUTO' ? pill('ok','AUTO') : pill('warn','MANUAL');
+  const L = st.link || {};
+  $('#s-link').innerHTML = !L.connected ? pill('bad','LOST') : L.stale ? pill('warn','STALE') : pill('ok','CONNECTED');
+  $('#v-spo2').textContent = st.spo2 == null ? '--' : st.spo2; $('#v-etco2').textContent = st.etco2 == null ? '--' : st.etco2;
+  const v = st.settings || {};
+  $('#v-vt').textContent = v.vt != null ? `${Math.round(v.vt)} mL` : '—'; $('#v-rr').textContent = v.rr != null ? `${Math.round(v.rr)} /min` : '—';
+  $('#v-peep').textContent = v.peep != null ? `${Math.round(v.peep)} cmH₂O` : '—'; $('#v-fio2').textContent = v.fio2 != null ? `${Math.round(v.fio2*100)} %` : '—';
+  const ul = $('#events'); ul.innerHTML = '';
+  (st.scenarios || []).slice().reverse().forEach(e => { const li = document.createElement('li'); const b = document.createElement('b'); b.textContent = mmss(e.t); li.appendChild(b); li.appendChild(document.createTextNode(e.name + (Object.keys(e.params||{}).length ? ' ' + JSON.stringify(e.params) : ''))); ul.appendChild(li); });
+}
+
+function connect(){
+  ws = new WebSocket(WS);
+  ws.onopen = () => { $('#s-bridge').innerHTML = pill('ok','CONNECTED'); send({type:'admin', name:'status'}); };
+  ws.onclose = () => { $('#s-bridge').innerHTML = pill('bad','DISCONNECTED'); $('#start').disabled = true; $('#stop').disabled = true; setTimeout(connect, 2000); };
+  ws.onmessage = ev => {
+    let m; try { m = JSON.parse(ev.data); } catch(e){ return; }
+    if (m.type === 'admin_status'){ st = m; render(); }
+    else if (m.type === 'admin_error'){ $('#err').textContent = m.message; $('#start').disabled = false; }
+    else if (m.type === 'frame' && st){ st.t = m.t; st.spo2 = m.shown && m.shown.spo2; st.etco2 = m.shown && m.shown.etco2; st.settings = m.vent; st.mode = m.mode; st.engaged = m.engaged; st.link = m.link; render(); }
+  };
+}
+
+$('#speed').addEventListener('input', () => { $('#speedv').textContent = $('#speed').value + '×'; });
+$('#start').addEventListener('click', () => {
+  $('#err').textContent = ''; $('#start').disabled = true;
+  send({ type:'admin', name:'start', kind:'pulse', patient: $('#patient').value, speed: +$('#speed').value,
+         init_settings: { vt: +$('#vt').value, rr: +$('#rr').value, peep: +$('#peep').value, fio2: (+$('#fio2').value)/100 } });
+});
+$('#stop').addEventListener('click', () => send({ type:'admin', name:'stop' }));
+$('#open').addEventListener('click', () => window.open('/clover', 'clover'));
+document.querySelectorAll('button[data-s]').forEach(b => b.addEventListener('click', () => {
+  const s = b.dataset.s, num = id => { const el = $(id); return el ? +el.value : undefined; };
+  const params = {};
+  if (s === 'injury') params.severity = num('#p-injury');
+  if (s === 'hypo') params.intensity = num('#p-hypo');
+  if (s === 'shunt') params.severity = num('#p-shunt');
+  if (s === 'obstruction') params.severity = num('#p-obstruction');
+  if (s === 'pneumo'){ params.severity = num('#p-pneumo'); params.side = $('#p-pneumo-side').value; }
+  if (s === 'decompress') params.side = $('#p-decompress-side').value;
+  if (s === 'hemorrhage'){ params.rate = num('#p-hemorrhage'); params.compartment = $('#p-hemo-comp').value; }
+  if (s === 'stop_bleed') params.compartment = $('#p-hemo-comp').value;
+  if (s === 'fluids'){ params.volume = num('#p-fluids'); params.rate = num('#p-fluids-rate'); }
+  if (s === 'dropout') params.seconds = num('#p-dropout');
+  if (s === 'stale') params.seconds = num('#p-stale');
+  if (s === 'panel'){ params.key = $('#p-panel-key').value; params.value = num('#p-panel'); if (params.key === 'fio2' && params.value > 1) params.value /= 100; }
+  if (s === 'alarm') params.text = $('#p-alarm-text').value;
+  send({ type:'scenario', name: s, params });
+}));
+
+fetch('/config.json').then(r => r.json()).then(c => { WS = c.ws; connect(); })
+  .catch(() => { WS = `ws://${location.hostname || 'localhost'}:8766`; connect(); });
+})();
+</script>
+</body>
+</html>

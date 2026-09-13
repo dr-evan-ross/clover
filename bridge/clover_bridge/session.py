@@ -63,6 +63,7 @@ class Session:
     # link
     last_frame_t: Optional[float] = None
     connected: bool = False
+    synced: bool = False   # False until the vent's read-back has seeded our settings (start, and after ENGAGE)
     cmd: dict[str, Any] = field(default_factory=lambda: {"status": "none"})
     remote: Optional[str] = None
     mismatch: Optional[dict] = None
@@ -137,6 +138,13 @@ class Session:
         if len(self.hist) > 3700:
             del self.hist[0]
         self.measured = {k: v for k, v in fr.measured.items() if k not in ("spo2", "etco2")}
+        # first frame after start/ENGAGE: the vent's read-back IS the truth, adopt it silently
+        if not self.synced:
+            for k in ("vt", "rr", "peep", "fio2", "ie"):
+                if k in fr.settings:
+                    self.settings[k] = fr.settings[k]
+            self.synced = True
+            self.mismatch = None
         # read-back vs belief
         for k in ("vt", "rr", "peep", "fio2", "ie"):
             if k in fr.settings and k in self.settings and abs(fr.settings[k] - self.settings[k]) > 1e-6:
@@ -178,6 +186,8 @@ class Session:
             if rank[st] > rank[self.prev_state[k]]:
                 worse.append("SpO2" if k == "spo2" else "etCO2")
             self.prev_state[k] = st
+        if self.last_frame_t is None:      # nothing from the vent yet: no decisions, no interrupts
+            return out
         if self.engaged and worse and self.t - self.last_decision > 0:
             out.append(self.run_controller(f"{' and '.join(worse)} left target range"))
         elif self.engaged and self.t - self.last_decision >= DECISION_PERIOD:
@@ -263,6 +273,7 @@ class Session:
             if want:
                 self.mode, self.mode_since = "AUTO", self.t
                 self.overrides.clear(); self.suggest.clear()
+                self.synced = False   # re-read settings from the vent on the next frame
                 self.last_decision = self.t - DECISION_PERIOD
                 self.add_log("USER", "ENGAGE - CLOVER in control", f"Settings read back from the ventilator: {settings}. FULL AUTO; first decision immediately.")
             else:

@@ -1,7 +1,24 @@
 # CLOVER bridge
 
-Connects the medic GUI to a real ventilator, runs the controller, and keeps the log of
-record. See `CONTRACT.md` for the interfaces.
+Connects the medic GUI to a ventilator (real, stub, or the Pulse Physiology Engine), runs
+the controller, and keeps the log of record. See `CONTRACT.md` for the interfaces.
+
+## The easy way: one launcher, two browser pages
+
+From the `clover` folder, double-click `start_clover.sh` (Linux/macOS) or `start_clover.py`
+(Windows), or run `python3 start_clover.py`. It finds the Python with the Pulse bindings
+(the sibling `vent_optimizer/.venv`), starts the bridge, and opens the **control page**:
+
+- **http://localhost:8765/** — pick a patient (28 Pulse states), speed, initial vent
+  settings; START / STOP the session; inject scenarios with parameters (ARDS severity,
+  hemorrhage site and rate, pneumothorax side, fluids, probe off, stale stream, panel
+  change, vent alarms); live status.
+- **http://localhost:8765/clover** — the CLOVER medic display, already connected to the
+  bridge (the control page has an OPEN CLOVER DISPLAY button). It shows LINK LOST until a
+  session is started and reconnects on its own.
+
+Close the launcher window (or Ctrl+C) to stop everything. No file paths or URL parameters
+to type. Sessions can be restarted from the control page without restarting the launcher.
 
 ## Run with the simulated ventilator
 
@@ -65,7 +82,9 @@ bridge/
     pulse_adapter.py       Pulse Physiology Engine as patient + ventilator (needs vent_optimizer)
     controller.py          CLOVER decision logic with reasoning strings
     session.py             session state, authority model, log, frame/snapshot JSON
-    server.py              asyncio WebSocket server tying it together
+    server.py              asyncio WebSocket server, sessions, admin commands
+    webui.py               serves the control page and the CLOVER display over HTTP
+  control.html             the Pulse control page
     openice.py             OpenICE/DDS topic mapping and publisher hook (optional)
   tests/test_core.py         stdlib unit tests
   tests/test_integration.py  bridge + stub over a real WebSocket (needs websockets)
