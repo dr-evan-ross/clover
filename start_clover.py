@@ -23,7 +23,7 @@ def venv_python() -> str | None:
     for cand in (os.path.join(VENT_OPT, ".venv", "bin", "python"),
                  os.path.join(VENT_OPT, ".venv", "Scripts", "python.exe")):
         if os.path.exists(cand):
-            return os.path.realpath(cand)   # avoids the venv's "unexpected sys.exec_prefix" warning
+            return os.path.abspath(cand)    # keep the venv path itself: resolving the symlink would leave the venv
     return None
 
 
