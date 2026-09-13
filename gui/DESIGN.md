@@ -208,7 +208,8 @@ is applied to the arrows only; the slash never rotates.
 - Provider / RT screen (denser: waveforms or trends visible by default, more numbers,
   reasoning inline).
 - Custom layout mode (choose which tiles show, within the same fixed grid).
-- ~~Interface contract~~ done: `bridge/CONTRACT.md`, with a Python bridge and stub adapter.
+- ~~Interface contract~~ done: `bridge/CONTRACT.md`, with a Python bridge, a stub adapter, and a
+  Pulse Physiology Engine adapter (real capnogram, pulse waveform, physiological disturbances).
   Remaining: the vendor adapter (private), bench run in MANUAL, then AUTO on a test lung.
 - The ventilator card's identity comes from the adapter in live mode; the Zoll 731 EMV+
   text is only the simulator's placeholder.

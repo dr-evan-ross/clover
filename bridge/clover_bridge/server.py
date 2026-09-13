@@ -21,19 +21,31 @@ from .session import Session
 log = logging.getLogger("clover.bridge")
 
 
-def load_adapter(spec: str) -> VentAdapter:
+def load_adapter(spec: str, **opts) -> VentAdapter:
     if spec == "stub":
         from .stub_adapter import StubVent
-        return StubVent()
+        return StubVent(speed=opts.get("speed", 1.0))
+    if spec == "pulse":
+        from .pulse_adapter import PulseVent
+        return PulseVent(patient=opts.get("patient", "DefaultMale"), root=opts.get("root"),
+                         speed=opts.get("speed", 1.0))
     mod, _, cls = spec.partition(":")
     return getattr(importlib.import_module(mod), cls or "Adapter")()
 
 
 class Bridge:
-    def __init__(self, adapter: VentAdapter, tick: float = 1.0):
+    """Session time runs in *simulation* seconds. With ``speed`` > 1 (accelerated demos)
+    the session ticks ``speed`` times per wall second so the controller cycle, override
+    timers and stale detection stay in step with the physiology; GUI frames are throttled
+    to ``gui_hz`` so the browser is not flooded."""
+
+    def __init__(self, adapter: VentAdapter, tick: float = 1.0, speed: float = 1.0, gui_hz: float = 4.0):
         self.adapter = adapter
         self.session = Session()
         self.tick = tick
+        self.speed = max(0.01, float(speed))
+        self.gui_min_interval = 1.0 / gui_hz
+        self._last_flush = 0.0
         self.clients: set[Any] = set()
         self._write_lock = asyncio.Lock()
 
@@ -51,10 +63,14 @@ class Bridge:
         for ws in dead:
             self.clients.discard(ws)
 
-    async def flush(self) -> None:
-        for e in self.session.drain_log():
+    async def flush(self, force: bool = False) -> None:
+        logs = self.session.drain_log()
+        for e in logs:
             await self.send_all({"type": "log", "entry": e})
-        await self.send_all(self.session.frame_json())
+        now = asyncio.get_event_loop().time()
+        if force or logs or now - self._last_flush >= self.gui_min_interval:
+            self._last_flush = now
+            await self.send_all(self.session.frame_json())
 
     # ---- adapter side ----
     async def run_frames(self) -> None:
@@ -80,7 +96,7 @@ class Bridge:
 
     async def run_ticks(self) -> None:
         while True:
-            await asyncio.sleep(self.tick)
+            await asyncio.sleep(self.tick / self.speed)
             decisions = self.session.tick(self.tick)
             await self.apply_decisions(decisions)
             await self.flush()
@@ -96,13 +112,16 @@ class Bridge:
                 except json.JSONDecodeError:
                     continue
                 if cmd.get("type") == "scenario" and hasattr(self.adapter, "scenario"):
-                    self.adapter.scenario(cmd.get("name", ""), cmd.get("seconds"))   # demo scaffolding only
-                    self.session.add_log("SYS", f"[sim] {cmd.get('name')}", "")
+                    try:
+                        self.adapter.scenario(cmd.get("name", ""), cmd.get("seconds"))   # demo scaffolding only
+                        self.session.add_log("SYS", f"[sim] {cmd.get('name')}", "")
+                    except Exception as e:  # unknown scenario for this adapter, or engine refused
+                        self.session.add_log("SYS", f"[sim] {cmd.get('name')} not available", f"{type(e).__name__}: {e}")
                 elif cmd.get("type") == "cmd":
                     writes = self.session.handle_command(cmd)
                     for k, val, src, kind in writes:
                         await self.write(k, val, src, kind)
-                await self.flush()
+                await self.flush(force=True)
         finally:
             self.clients.discard(ws)
 
@@ -118,13 +137,16 @@ class Bridge:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="CLOVER GUI <-> ventilator bridge")
-    ap.add_argument("--adapter", default="stub", help="'stub' or 'module.path:ClassName'")
+    ap.add_argument("--adapter", default="stub", help="'stub', 'pulse', or 'module.path:ClassName'")
+    ap.add_argument("--patient", default="DefaultMale", help="pulse: patient state name (e.g. CSTARS-Patient3) or path")
+    ap.add_argument("--speed", type=float, default=1.0, help="stub/pulse: simulation speed multiple of real time")
+    ap.add_argument("--vent-optimizer", dest="root", default=None, help="pulse: path to the vent_optimizer project (default ../vent_optimizer)")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args()
     logging.basicConfig(level=logging.DEBUG if a.verbose else logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    asyncio.run(Bridge(load_adapter(a.adapter)).run(a.host, a.port))
+    asyncio.run(Bridge(load_adapter(a.adapter, patient=a.patient, speed=a.speed, root=a.root), speed=a.speed).run(a.host, a.port))
 
 
 if __name__ == "__main__":

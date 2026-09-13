@@ -19,7 +19,9 @@ Open the GUI with `?ws=ws://host:port` to use a bridge instead of the built-in s
 
 ## 1. Ventilator side: `VentAdapter` (Python, `clover_bridge/adapter.py`)
 
-Implement one class per ventilator. Vendor-specific code stays in that class.
+Implement one class per ventilator. Vendor-specific code stays in that class. Two
+implementations ship: `stub_adapter.py` (hand-written model) and `pulse_adapter.py` (the Pulse
+Physiology Engine as patient and ventilator, via the sibling `vent_optimizer` project).
 
 | Method | Purpose |
 |---|---|
