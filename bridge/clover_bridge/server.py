@@ -36,7 +36,9 @@ def load_adapter(spec: str, **opts) -> VentAdapter:
     if spec == "pulse":
         from .pulse_adapter import PulseVent
         return PulseVent(patient=opts.get("patient", "DefaultMale"), root=opts.get("root"),
-                         speed=opts.get("speed", 1.0), init_settings=opts.get("init_settings"))
+                         speed=opts.get("speed", 1.0), init_settings=opts.get("init_settings"),
+                         intubate=bool(opts.get("intubate", True)), effort=opts.get("effort", "none"),
+                         vc_mode=opts.get("vc_mode", "CMV"))
     mod, _, cls = spec.partition(":")
     return getattr(importlib.import_module(mod), cls or "Adapter")()
 
@@ -226,6 +228,9 @@ class Bridge:
                 opts["patient"] = cmd.get("patient", "DefaultMale")
                 if cmd.get("init_settings"):
                     opts["init_settings"] = {k: float(v) for k, v in cmd["init_settings"].items()}
+                for key in ("intubate", "effort", "vc_mode"):
+                    if key in cmd:
+                        opts[key] = cmd[key]
             try:
                 await self.start_session(kind, **opts)
             except Exception as e:

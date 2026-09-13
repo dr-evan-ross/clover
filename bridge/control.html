@@ -58,6 +58,12 @@ ul.ev li b{color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;ma
     <select id="patient"></select>
     <label>Speed <span id="speedv">1×</span> real time</label>
     <input type="range" id="speed" min="1" max="30" step="1" value="1">
+    <div class="row">
+      <div><label>Airway</label><select id="airway"><option value="1">Intubated (tracheal)</option><option value="0">Not intubated</option></select></div>
+      <div><label>Vent mode</label><select id="vcmode"><option value="CMV">Volume control · CMV</option><option value="AC">Volume control · AC</option></select></div>
+    </div>
+    <label>Spontaneous effort</label>
+    <select id="effort"><option value="none">None · sedated and paralysed (clean controlled ventilation)</option><option value="reduced">Reduced · light sedation</option><option value="full">Full · awake drive (expect asynchrony)</option></select>
     <label>Initial ventilator settings</label>
     <div class="row4">
       <div><label style="margin-top:0">VT mL</label><input type="number" id="vt" value="500" step="25"></div>
@@ -86,6 +92,8 @@ ul.ev li b{color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;ma
     <div class="scen"><button data-s="decompress">Needle decompression</button><div class="p"><select id="p-decompress-side"><option>Left</option><option>Right</option></select></div></div>
     <div class="scen"><button data-s="hemorrhage">Hemorrhage</button><div class="p"><select id="p-hemo-comp"><option>RightLeg</option><option>LeftLeg</option><option>RightArm</option><option>LeftArm</option><option>Aorta</option><option>VenaCava</option></select> <input type="number" id="p-hemorrhage" value="250" step="50" min="0"> mL/min</div></div>
     <div class="scen"><button data-s="stop_bleed">Stop bleeding</button><div class="p"></div></div>
+    <div class="scen"><button data-s="wake">Patient wakes up · spontaneous effort</button><div class="p"><select id="p-wake"><option value="full">full</option><option value="reduced">reduced</option></select></div></div>
+    <div class="scen"><button data-s="paralyze">Sedate and paralyse</button><div class="p"></div></div>
     <div class="scen"><button data-s="fluids">Fluid bolus (saline)</button><div class="p"><input type="number" id="p-fluids" value="1000" step="250" min="0"> mL @ <input type="number" id="p-fluids-rate" value="100" step="50"> mL/min</div></div>
     <h2 style="margin-top:18px">Device and signal faults</h2>
     <div class="scen"><button data-s="dropout">SpO₂ probe off</button><div class="p"><input type="number" id="p-dropout" value="40" step="10"> s</div></div>
@@ -165,6 +173,7 @@ $('#speed').addEventListener('input', () => { $('#speedv').textContent = $('#spe
 $('#start').addEventListener('click', () => {
   $('#err').textContent = ''; $('#start').disabled = true;
   send({ type:'admin', name:'start', kind:'pulse', patient: $('#patient').value, speed: +$('#speed').value,
+         intubate: $('#airway').value === '1', effort: $('#effort').value, vc_mode: $('#vcmode').value,
          init_settings: { vt: +$('#vt').value, rr: +$('#rr').value, peep: +$('#peep').value, fio2: (+$('#fio2').value)/100 } });
 });
 $('#stop').addEventListener('click', () => send({ type:'admin', name:'stop' }));
@@ -180,6 +189,7 @@ document.querySelectorAll('button[data-s]').forEach(b => b.addEventListener('cli
   if (s === 'decompress') params.side = $('#p-decompress-side').value;
   if (s === 'hemorrhage'){ params.rate = num('#p-hemorrhage'); params.compartment = $('#p-hemo-comp').value; }
   if (s === 'stop_bleed') params.compartment = $('#p-hemo-comp').value;
+  if (s === 'wake') params.effort = $('#p-wake').value;
   if (s === 'fluids'){ params.volume = num('#p-fluids'); params.rate = num('#p-fluids-rate'); }
   if (s === 'dropout') params.seconds = num('#p-dropout');
   if (s === 'stale') params.seconds = num('#p-stale');

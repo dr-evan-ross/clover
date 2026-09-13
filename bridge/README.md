@@ -52,6 +52,12 @@ VTe/PIP/Pplat/Pmean, and disturbances with real physiology. The SIM panel's Puls
 with this adapter; the shared ones (lung injury, CO₂ rise, probe off, link faults) work
 with both. Out-of-range writes are rejected the way a real vent would reject them.
 
+Pulse patients load awake and un-intubated. The adapter places a tracheal tube and abolishes
+spontaneous drive by default (Pulse dyspnea severity 1.0, the equivalent of your library's
+rocuronium event), which gives clean controlled ventilation. The control page lets you choose
+not intubated, reduced or full effort, and CMV or AC, and two scenarios ("Patient wakes up",
+"Sedate and paralyse") switch drive on and off mid-session to show asynchrony deliberately.
+
 ## Run with your ventilator
 
 1. Copy `clover_bridge/stub_adapter.py` to a private module and implement the five

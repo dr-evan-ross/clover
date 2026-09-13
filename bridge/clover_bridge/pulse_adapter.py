@@ -48,8 +48,14 @@ def _f(v) -> Optional[float]:
 class PulseVent(VentAdapter):
     def __init__(self, patient: str = "DefaultMale", root: str | None = None,
                  speed: float = 1.0, sample_hz: int = 50, init_settings: dict | None = None,
-                 seed: int | None = 1):
+                 seed: int | None = 1, intubate: bool = True, effort: str = "none", vc_mode: str = "CMV"):
+        """effort: 'none' (sedated/paralysed, clean controlled ventilation), 'reduced', or 'full'
+        (awake drive; expect patient-ventilator asynchrony). Pulse states load awake and
+        un-intubated, so the defaults place a tracheal tube and abolish drive."""
         self.patient = patient
+        self.intubate = intubate
+        self.effort = effort
+        self.vc_mode = vc_mode
         self.root = root or DEFAULT_ROOT
         self.speed = float(speed)
         self.sample_hz = int(sample_hz)
@@ -122,6 +128,10 @@ class PulseVent(VentAdapter):
         if not self.eng.serialize_from_file(path, drm):
             raise RuntimeError(f"Pulse could not load patient state {path!r} (cwd {os.getcwd()})")
         self.m = build_action_map()
+        from scenario_runner.actions import apply_event, Synth
+        if self.intubate:
+            apply_event(self.eng, self.m, Synth("intubation", {"type": "Tracheal"}))
+        self._set_effort(self.effort)
         self._apply_vent()
         self.eng.advance_time_s(8.0)       # settle: end-tidal CO2 needs a full breath or two after the vent connects
         self._pull()
@@ -130,7 +140,8 @@ class PulseVent(VentAdapter):
         return Identity(make="Kitware Pulse", model=f"Physiology Engine · {name}", serial=name,
                         firmware="pulse_engine build", transport="in-process",
                         supports_remote_state=False, writable=("vt", "rr", "peep", "fio2", "ie"),
-                        extra={"patient_state": path, "sample_hz": self.sample_hz})
+                        extra={"patient_state": path, "sample_hz": self.sample_hz, "intubated": self.intubate,
+                               "effort": self.effort, "vc_mode": self.vc_mode})
 
     async def stop(self) -> None:
         self._stop.set()
@@ -159,6 +170,14 @@ class PulseVent(VentAdapter):
         self._apply_vent()
         return CommandResult("ack", "", readback=self.settings[key])
 
+    EFFORT_SEVERITY = {"none": 1.0, "reduced": 0.6, "full": 0.0}   # Pulse dyspnea severity: 1 = no drive
+
+    def _set_effort(self, effort: str) -> None:
+        from scenario_runner.actions import apply_event, Synth
+        sev = self.EFFORT_SEVERITY.get(effort, 1.0)
+        apply_event(self.eng, self.m, Synth("dyspnea", {"rr_severity": sev, "vt_severity": sev}))
+        self.effort = effort
+
     # ------------------------------------------------------------------ scenarios (demo only)
     def scenario(self, name: str, seconds: float | None = None, params: dict | None = None) -> None:
         """Demo disturbances. ``params`` (from the control page) override the defaults."""
@@ -176,6 +195,8 @@ class PulseVent(VentAdapter):
         elif name == "pneumo":        ev = Synth("tension_pneumothorax", {"side": side, "severity": float(p.get("severity", 0.7))})
         elif name == "decompress":    ev = Synth("needle_decompression", {"side": side, "state": "on"})
         elif name == "shunt":         ev = Synth("pulmonary_shunt", {"severity": sev})
+        elif name == "wake":          self._set_effort(p.get("effort", "full"))      # spontaneous drive returns -> asynchrony
+        elif name == "paralyze":      self._set_effort("none")
         elif name == "fluids":        ev = Synth("fluid_infusion", {"compound": p.get("compound", "Saline"), "rate_mL_per_min": float(p.get("rate", 100.0)), "bag_volume_mL": float(p.get("volume", 1000.0))})
         elif name == "dropout":       self.probe_off_until = self.t + (seconds or float(p.get("seconds", 40)))
         elif name == "stale":         self.stale_until = self.t + (seconds or float(p.get("seconds", 15)))
@@ -199,7 +220,8 @@ class PulseVent(VentAdapter):
         ti = (60.0 / s["rr"]) / (1.0 + s["ie"])       # I:E 1:x -> inspiratory time
         v = m["VC"]()
         v.set_connection(m["On"])
-        v.set_mode(eMechanicalVentilator_VolumeControlMode.ContinuousMandatoryVentilation)
+        v.set_mode(eMechanicalVentilator_VolumeControlMode.AssistedControl if str(self.vc_mode).upper() == "AC"
+                   else eMechanicalVentilator_VolumeControlMode.ContinuousMandatoryVentilation)
         v.get_fraction_inspired_oxygen().set_value(s["fio2"])
         v.get_inspiratory_period().set_value(ti, m["TimeUnit"].s)
         v.get_tidal_volume().set_value(s["vt"], m["VolumeUnit"].mL)
