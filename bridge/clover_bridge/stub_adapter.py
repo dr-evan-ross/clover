@@ -73,7 +73,7 @@ class StubVent(VentAdapter):
         return CommandResult("ack", "", readback=self.settings[key])
 
     # ---- scenario hooks (not part of the interface) ----
-    def scenario(self, name: str) -> None:
+    def scenario(self, name: str, seconds: float | None = None) -> None:
         p = self.patient
         if name == "injury":
             p["shunt"] = 0.45
@@ -85,7 +85,7 @@ class StubVent(VentAdapter):
             p["signal"] = False
             self._signal_until = self.t + 40
         elif name == "stale":
-            self._stale_until = self.t + 15
+            self._stale_until = self.t + (seconds or 15)
         elif name == "reject":
             self._reject_next = True
         elif name == "panel":

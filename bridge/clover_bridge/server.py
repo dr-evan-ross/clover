@@ -96,7 +96,7 @@ class Bridge:
                 except json.JSONDecodeError:
                     continue
                 if cmd.get("type") == "scenario" and hasattr(self.adapter, "scenario"):
-                    self.adapter.scenario(cmd.get("name", ""))   # demo scaffolding only
+                    self.adapter.scenario(cmd.get("name", ""), cmd.get("seconds"))   # demo scaffolding only
                     self.session.add_log("SYS", f"[sim] {cmd.get('name')}", "")
                 elif cmd.get("type") == "cmd":
                     writes = self.session.handle_command(cmd)
