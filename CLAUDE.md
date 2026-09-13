@@ -35,5 +35,5 @@ the next frame. Keep that rule when adding controls.
 - The prototype is a single HTML file, no build step, no libraries. Keep it that way.
 - The stage is a fixed 1280×990 grid scaled to the window. All row heights are explicit
   pixels; never let a row be "the remainder".
-- Vocabulary: AUTO / MANUAL / STOPPED, START / STOP, UPDATE, BRIGHT / DIM / RED.
+- Vocabulary: FULL AUTO / PARTIAL OVERRIDE / MANUAL / DISENGAGED, ENGAGE / DISENGAGE CLOVER, UPDATE, SETUP, BRIGHT / DIM / RED. Never STOP, START, HALTED, HYBRID.
 - After editing, re-check that left-column and right-column row edges still align.
