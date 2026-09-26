@@ -1,6 +1,8 @@
 clover_launcher.log
 .DS_Store
 pulse_runtime/
+*.pyc
+__pycache__/
 *.swp
 Thumbs.db
 .venv/
