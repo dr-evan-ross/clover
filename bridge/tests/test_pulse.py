@@ -9,17 +9,13 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from clover_bridge.pulse_adapter import DEFAULT_ROOT  # noqa: E402
+from clover_bridge.pulse_support import pulse_env  # noqa: E402
+
 
 def _pulse_importable() -> bool:
-    """Pulse bindings need the vent_optimizer venv (numpy, pandas, protobuf); skip elsewhere."""
-    py = os.path.join(DEFAULT_ROOT, "pulse_engine", "python")
-    if not os.path.isdir(py):
-        return False
+    """Needs a Pulse runtime (pulse_runtime/ or vent_optimizer/pulse_engine) and its Python deps."""
     try:
-        sys.path.insert(0, DEFAULT_ROOT)
-        from common import pulse_env      # same bootstrap the adapter uses (paths, no chdir)
-        pulse_env.bootstrap(chdir=False)
+        pulse_env.bootstrap(chdir=False)  # same lookup the adapter uses
         import pulse.engine.PulseEngine  # noqa: F401
         return True
     except Exception:
@@ -29,7 +25,7 @@ def _pulse_importable() -> bool:
 HAVE_PULSE = _pulse_importable()
 
 
-@unittest.skipUnless(HAVE_PULSE, "Pulse bindings not importable here; run under vent_optimizer/.venv")
+@unittest.skipUnless(HAVE_PULSE, "Pulse runtime or its Python deps not available in this interpreter")
 class PulseAdapterTests(unittest.TestCase):
     def test_frames_waves_write_and_disturbance(self):
         asyncio.run(self._run())

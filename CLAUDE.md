@@ -22,8 +22,10 @@ on request, everything logged with reasoning, one strict grid.
   `VentAdapter` interface, a stub ventilator, the controller, session/authority model, and
   the log of record. `bridge/CONTRACT.md` is the interface spec. Tests are stdlib-only:
   `python3 -m unittest discover -s bridge/tests`. The vendor adapter is private and lives
-  outside this repo. `pulse_adapter.py` runs the Pulse Physiology Engine (from the sibling
-  `../vent_optimizer` project, use its `.venv`) as patient and ventilator for demos.
+  outside this repo. `pulse_adapter.py` runs the Pulse Physiology Engine as patient and ventilator for demos.
+  It needs a Pulse runtime: `pulse_runtime/` in the repo (git-ignored; build with
+  `tools/make_pulse_runtime.py` from a full install) or `../vent_optimizer/pulse_engine`.
+  Python deps: `requirements-pulse.txt`; `start_clover.py` makes `.venv` on first run.
 
 ## Demo launcher
 

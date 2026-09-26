@@ -30,9 +30,11 @@ from typing import AsyncIterator, Optional
 from .adapter import (Alarm, CommandResult, Frame, Identity, VentAdapter,
                       WaveChunk)
 
+from .pulse_support import pulse_env as _penv
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_ROOT = os.environ.get("CLOVER_VENT_OPTIMIZER") or os.path.normpath(
-    os.path.join(HERE, "..", "..", "..", "vent_optimizer"))
+    os.path.join(HERE, "..", "..", "..", "vent_optimizer"))   # kept for --vent-optimizer; runtime lookup is in pulse_support
 
 # Device-range limits the "ventilator" enforces (a real vent rejects outside these).
 DEVICE_RANGE = {"vt": (100, 1500), "rr": (4, 50), "peep": (0, 30), "fio2": (0.21, 1.0), "ie": (1.0, 4.0)}
@@ -90,20 +92,22 @@ class PulseVent(VentAdapter):
     # ------------------------------------------------------------------ VentAdapter
     @staticmethod
     def list_patients(root: str | None = None) -> list[str]:
-        d = os.path.join(root or DEFAULT_ROOT, "pulse_engine", "bin", "states")
-        if not os.path.isdir(d):
+        rt = _penv.find_runtime()
+        if rt is None and root:
+            rt = os.path.join(root, "pulse_engine")
+        d = os.path.join(rt, "bin", "states") if rt else ""
+        if not d or not os.path.isdir(d):
             return []
         return sorted(f.replace("@0s.json", "") for f in os.listdir(d) if f.endswith("@0s.json"))
 
     async def start(self) -> Identity:
-        if self.root not in sys.path:
-            sys.path.insert(0, self.root)
-        from common import pulse_env                       # noqa: E402  (vent_optimizer)
-        pulse_env.bootstrap(chdir=True)                    # Pulse wants cwd = pulse_engine/bin
+        if self.root and self.root != DEFAULT_ROOT:
+            os.environ.setdefault("CLOVER_VENT_OPTIMIZER", self.root)
+        self.runtime = _penv.bootstrap(chdir=True)          # Pulse wants cwd = <runtime>/bin
         from pulse.engine.PulseEngine import PulseEngine  # noqa: E402
         from pulse.cdm.engine import SEDataRequest, SEDataRequestManager  # noqa: E402
         from pulse.cdm import scalars as S                 # noqa: E402
-        from scenario_runner.actions import build_action_map  # noqa: E402
+        from .pulse_support.actions import build_action_map  # noqa: E402
 
         P, V = SEDataRequest.create_physiology_request, SEDataRequest.create_mechanical_ventilator_request
         spec = [
@@ -134,7 +138,7 @@ class PulseVent(VentAdapter):
         if not self.eng.serialize_from_file(path, drm):
             raise RuntimeError(f"Pulse could not load patient state {path!r} (cwd {os.getcwd()})")
         self.m = build_action_map()
-        from scenario_runner.actions import apply_event, Synth
+        from .pulse_support.actions import apply_event, Synth
         if self.intubate:
             apply_event(self.eng, self.m, Synth("intubation", {"type": "Tracheal"}))
         self._set_effort(self.effort)
@@ -147,7 +151,7 @@ class PulseVent(VentAdapter):
                         firmware="pulse_engine build", transport="in-process",
                         supports_remote_state=False, writable=("vt", "rr", "peep", "fio2", "ie"),
                         extra={"patient_state": path, "sample_hz": self.sample_hz, "intubated": self.intubate,
-                               "effort": self.effort, "vc_mode": self.vc_mode})
+                               "effort": self.effort, "vc_mode": self.vc_mode, "runtime": self.runtime})
 
     async def stop(self) -> None:
         self._stop.set()
@@ -212,7 +216,7 @@ class PulseVent(VentAdapter):
     EFFORT_SEVERITY = {"none": 1.0, "reduced": 0.6, "full": 0.0}   # Pulse dyspnea severity: 1 = no drive
 
     def _set_effort(self, effort: str) -> None:
-        from scenario_runner.actions import apply_event, Synth
+        from .pulse_support.actions import apply_event, Synth
         sev = self.EFFORT_SEVERITY.get(effort, 1.0)
         apply_event(self.eng, self.m, Synth("dyspnea", {"rr_severity": sev, "vt_severity": sev}))
         self.effort = effort
@@ -220,7 +224,7 @@ class PulseVent(VentAdapter):
     # ------------------------------------------------------------------ scenarios (demo only)
     def scenario(self, name: str, seconds: float | None = None, params: dict | None = None) -> None:
         """Demo disturbances. ``params`` (from the control page) override the defaults."""
-        from scenario_runner.actions import apply_event, Synth
+        from .pulse_support.actions import apply_event, Synth
         p = dict(params or {})
         sev = float(p.get("severity", 0.6))
         side = p.get("side", "Left")

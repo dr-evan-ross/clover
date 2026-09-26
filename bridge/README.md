@@ -5,7 +5,7 @@ the controller, and keeps the log of record. See `CONTRACT.md` for the interface
 
 ## The easy way: one launcher, two browser pages
 
-From the `clover` folder, double-click **CLOVER Demo.desktop** (Linux; the first time, KDE or
+Needs a Pulse runtime (see below). From the `clover` folder, double-click **CLOVER Demo.desktop** (Linux; the first time, KDE or
 GNOME may ask you to trust or "allow launching" it), or `start_clover.py` on Windows, or run
 `./start_clover.sh` from a terminal. On Linux file managers a `.sh` opens in the editor rather
 than running, which is why the desktop launcher exists. The launcher always opens a terminal
@@ -36,17 +36,32 @@ card's label reads **Ventilator · LIVE** and the model comes from the adapter.
 
 ## Run with the Pulse Physiology Engine as patient and ventilator
 
-Uses the Pulse build and helpers in the sibling `vent_optimizer` project, so run under
-that project's Python (which has the Pulse bindings; `websockets` is installed there too):
+The bridge needs a **Pulse runtime**: a folder with `bin/` (the engine libraries, patient
+states, substances, configs) and `python/pulse/` (the bindings). It looks, in order, at
+`$CLOVER_PULSE_RUNTIME`, `<repo>/pulse_runtime/`, then `../vent_optimizer/pulse_engine`
+(a full Pulse install). Build a trimmed runtime from a full install with:
 
 ```bash
-../vent_optimizer/.venv/bin/python bridge/run_bridge.py --adapter pulse --patient DefaultMale
-../vent_optimizer/.venv/bin/python bridge/run_bridge.py --adapter pulse --patient CSTARS-Patient3 --speed 5
+python3 tools/make_pulse_runtime.py /path/to/pulse_engine pulse_runtime
 ```
 
-`--patient` is any state in `vent_optimizer/pulse_engine/bin/states` (28 of them), or a path.
-`--speed` runs physiology faster than real time for demos; 1.0 is real time. Set
-`CLOVER_VENT_OPTIMIZER` or `--vent-optimizer` if the project is not at `../vent_optimizer`.
+That keeps ~100 MB of a 13 GB install (no verification data, test drivers, Java or
+plotting subpackages) and writes `MANIFEST.json` with sizes and sha256 of every file.
+`pulse_runtime/` is git-ignored: distribute it as an archive. Pulse is Apache 2.0; keep its
+license and notices with the archive.
+
+Python dependencies are in `requirements-pulse.txt` (protobuf pinned to the Pulse build's
+major version, numpy, pandas, websockets). `start_clover.py` creates `.venv` and installs
+them on first run. Manually:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements-pulse.txt
+.venv/bin/python bridge/run_bridge.py --adapter pulse --patient DefaultMale
+.venv/bin/python bridge/run_bridge.py --adapter pulse --patient CSTARS-Patient3 --speed 5
+```
+
+`--patient` is any state in the runtime's `bin/states` (28 of them), or a path. `--speed`
+runs physiology faster than real time for demos; 1.0 is real time.
 
 What Pulse gives the GUI that the stub cannot: a real capnogram (CO₂ at the carina, 50 Hz),
 a pulse waveform (arterial pressure standing in for the pleth), the ventilator model's own
@@ -56,10 +71,11 @@ with this adapter; the shared ones (lung injury, CO₂ rise, probe off, link fau
 with both. Out-of-range writes are rejected the way a real vent would reject them.
 
 Pulse patients load awake and un-intubated. The adapter places a tracheal tube and abolishes
-spontaneous drive by default (Pulse dyspnea severity 1.0, the equivalent of your library's
-rocuronium event), which gives clean controlled ventilation. The control page lets you choose
-not intubated, reduced or full effort, and CMV or AC, and two scenarios ("Patient wakes up",
-"Sedate and paralyse") switch drive on and off mid-session to show asynchrony deliberately.
+spontaneous drive by default (Pulse dyspnea severity 1.0), which gives clean controlled
+ventilation. The control page lets you choose not intubated, reduced or full effort, and CMV
+or AC, and two scenarios ("Patient wakes up", "Sedate and paralyse") switch drive on and off
+mid-session to show asynchrony deliberately. Setting changes are applied at end-expiration
+because any mid-breath reconfiguration restarts Pulse's breath cycle.
 
 ## Run with your ventilator
 
@@ -88,7 +104,8 @@ bridge/
   clover_bridge/
     adapter.py             VentAdapter interface, Frame / WaveChunk / Alarm / CommandResult
     stub_adapter.py        simulated ventilator + patient (demo, tests)
-    pulse_adapter.py       Pulse Physiology Engine as patient + ventilator (needs vent_optimizer)
+    pulse_adapter.py       Pulse Physiology Engine as patient + ventilator
+    pulse_support/         runtime lookup (pulse_env.py) and disturbance vocabulary (actions.py), vendored
     controller.py          CLOVER decision logic with reasoning strings
     session.py             session state, authority model, log, frame/snapshot JSON
     server.py              asyncio WebSocket server, sessions, admin commands
@@ -97,5 +114,7 @@ bridge/
     openice.py             OpenICE/DDS topic mapping and publisher hook (optional)
   tests/test_core.py         stdlib unit tests
   tests/test_integration.py  bridge + stub over a real WebSocket (needs websockets)
-  tests/test_pulse.py        Pulse adapter (needs vent_optimizer; run under its .venv)
+  tests/test_pulse.py        Pulse adapter (needs a Pulse runtime and requirements-pulse.txt)
+tools/make_pulse_runtime.py  build a trimmed pulse_runtime/ from a full Pulse install
+requirements-pulse.txt       Python deps for Pulse + bridge
 ```

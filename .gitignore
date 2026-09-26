@@ -1,4 +1,6 @@
-.DS_Store
-Thumbs.db
-*.swp
 clover_launcher.log
+.DS_Store
+pulse_runtime/
+*.swp
+Thumbs.db
+.venv/

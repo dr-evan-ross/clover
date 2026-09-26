@@ -1,0 +1,6 @@
+# Python dependencies for running the Pulse Physiology Engine bindings + the CLOVER bridge.
+# protobuf must match the generation used by the Pulse build (protoc 29.x -> protobuf 5.29.x).
+protobuf>=5.29,<6
+numpy>=1.26
+websockets>=12
+pandas>=2.0          # pulse.cdm.plots imports it at load time via pulse.cdm.io.engine

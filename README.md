@@ -11,8 +11,8 @@ python3 start_clover.py
 ```
 
 Opens a control page to pick a patient and inject scenarios, with a button for the CLOVER
-display. Needs the sibling `vent_optimizer` project (Pulse Physiology Engine). See
-`bridge/README.md`.
+display. Needs a Pulse runtime (`pulse_runtime/`, ~100 MB, built from a Pulse install with
+`tools/make_pulse_runtime.py`) and creates its own `.venv` on first run. See `bridge/README.md`.
 
 ## Contents
 
